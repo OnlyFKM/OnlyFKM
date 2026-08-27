@@ -19,3 +19,55 @@ Soy un apasionado de los Esports, la programación y la ciberseguridad. Actualme
 ¡Si deseas ponerse en contacto conmigo o hablar sobre colaboraciones emocionantes, no dudes en escribirme a [fjcastillomartin@gmail.com]!
 
 ¡Gracias por visitar mi perfil de GitHub! Espero que encuentres interesantes mis proyectos y contribuciones. 😄
+
+---
+
+## 🚀 Proyecto: OnlyFKM
+
+Aplicación social para conocer gente nueva y hacer amigos. Los usuarios crean un perfil, descubren a otras personas, se envían solicitudes de amistad y las aceptan o rechazan.
+
+### Stack
+
+- **Frontend**: React + Vite (React Router para la navegación)
+- **Backend**: Node.js + Express, con los datos en memoria (sin base de datos por ahora)
+
+### Estructura
+
+```
+backend/    API REST (Express)
+frontend/   Aplicación web (React + Vite)
+```
+
+### Cómo ejecutar el proyecto
+
+**Backend** (puerto 4000):
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+**Frontend** (puerto 5173):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+El frontend redirige las peticiones a `/api` hacia el backend (configurado en `vite.config.js`), así que basta con abrir `http://localhost:5173` una vez ambos servidores estén corriendo.
+
+### Funcionalidades actuales
+
+- Elegir un perfil existente o crear uno nuevo (nombre, edad, bio, intereses)
+- Descubrir otros perfiles
+- Enviar solicitudes de amistad
+- Aceptar o rechazar solicitudes recibidas
+- Ver la lista de amigos
+
+### Próximos pasos
+
+- Persistencia con base de datos (PostgreSQL o MongoDB)
+- Autenticación real (por ahora se "entra" eligiendo un perfil, sin contraseña)
+- Chat entre amigos
