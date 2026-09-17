@@ -15,6 +15,7 @@ threat actors.
 - **Dashboard** — totals, 30-day trend, top groups/countries/sectors, timeline chart.
 - **Victims** — searchable, filterable (group, country, sector), paginated table.
 - **Groups** — profile per ransomware group with its listed victims.
+- **Auto-refresh** — an open tab silently re-fetches every 5 minutes (`src/components/AutoRefresh.tsx`), no manual reload needed. Actual data freshness is still bounded by the data source's own cache (15 minutes for the live feed provider).
 
 ## Data sources
 
