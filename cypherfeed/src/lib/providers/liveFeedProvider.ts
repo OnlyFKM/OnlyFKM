@@ -8,6 +8,7 @@ import type {
   VictimPage,
 } from "@/lib/types";
 import { SeedDataSource } from "@/lib/providers/seedProvider";
+import { FEED_REVALIDATE_SECONDS } from "@/lib/config";
 
 /**
  * Adapter for a public ransomware-tracking feed (e.g. ransomware.live-style API).
@@ -21,7 +22,6 @@ import { SeedDataSource } from "@/lib/providers/seedProvider";
  */
 
 const BASE_URL = process.env.RANSOM_FEED_BASE_URL ?? "https://api.ransomware.live/v2";
-const REVALIDATE_SECONDS = 60 * 15; // cache upstream responses for 15 minutes
 
 type FeedVictim = {
   victim?: string;
@@ -88,7 +88,7 @@ function normalizeGroup(raw: FeedGroup, victimCount: number): RansomGroup {
 
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
-    next: { revalidate: REVALIDATE_SECONDS },
+    next: { revalidate: FEED_REVALIDATE_SECONDS },
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`Feed request failed: ${path} (${res.status})`);

@@ -2,14 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { FEED_REVALIDATE_SECONDS } from "@/lib/config";
 
 /**
  * Periodically re-runs the current route's server rendering (without a full
- * page reload) so an open tab picks up new data on its own. Actual data
- * freshness is still bounded by the data source's own cache window (e.g. the
- * live feed provider's 15-minute revalidate).
+ * page reload) so an open tab picks up new data on its own. Matches the live
+ * feed provider's cache window so it never polls faster than new data can
+ * actually appear.
  */
-export function AutoRefresh({ intervalMs = 5 * 60 * 1000 }: { intervalMs?: number }) {
+export function AutoRefresh({
+  intervalMs = FEED_REVALIDATE_SECONDS * 1000,
+}: {
+  intervalMs?: number;
+}) {
   const router = useRouter();
 
   useEffect(() => {
