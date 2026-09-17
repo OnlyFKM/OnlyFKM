@@ -6,7 +6,7 @@ export function Navbar() {
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 font-mono font-semibold tracking-tight">
           <span className="inline-block h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
-          Cipherfeed
+          Cypherfeed
         </Link>
         <nav className="flex items-center gap-5 text-sm text-muted">
           <Link href="/" className="hover:text-foreground transition-colors">

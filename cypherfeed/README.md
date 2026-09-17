@@ -1,4 +1,4 @@
-# Cipherfeed
+# Cypherfeed
 
 A dashboard that tracks publicly disclosed ransomware victims and groups —
 functionally similar to public ransomware-leak trackers (e.g. ransom-db.com,

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cipherfeed — Ransomware activity tracker",
+  title: "Cypherfeed — Ransomware activity tracker",
   description:
     "A dashboard tracking publicly disclosed ransomware victims and groups for research and situational awareness.",
 };
