@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "lockbit",
+    "name": "LockBit",
+    "description": "Ransomware-as-a-service operation known for double-extortion leak sites.",
+    "firstSeen": "2019-09-01",
+    "active": false,
+    "victimCount": 13
+  },
+  {
+    "slug": "alphv-blackcat",
+    "name": "ALPHV/BlackCat",
+    "description": "RaaS group written in Rust, associated with large-scale healthcare and infrastructure incidents.",
+    "firstSeen": "2021-11-01",
+    "active": false,
+    "victimCount": 15
+  },
+  {
+    "slug": "clop",
+    "name": "Clop",
+    "description": "Group known for mass-exploitation of file-transfer vulnerabilities to enable bulk data theft.",
+    "firstSeen": "2019-02-01",
+    "active": true,
+    "victimCount": 14
+  },
+  {
+    "slug": "akira",
+    "name": "Akira",
+    "description": "RaaS operation targeting SMBs and enterprises via VPN and remote-access footholds.",
+    "firstSeen": "2023-03-01",
+    "active": true,
+    "victimCount": 16
+  },
+  {
+    "slug": "play",
+    "name": "Play",
+    "description": "Closed group primarily leveraging exposed remote-access services for initial access.",
+    "firstSeen": "2022-06-01",
+    "active": true,
+    "victimCount": 17
+  },
+  {
+    "slug": "blackbasta",
+    "name": "Black Basta",
+    "description": "RaaS operation active since 2022, frequently linked to social-engineering initial access.",
+    "firstSeen": "2022-04-01",
+    "active": true,
+    "victimCount": 17
+  },
+  {
+    "slug": "medusa",
+    "name": "Medusa",
+    "description": "RaaS group operating a public leak site and multi-extortion tactics.",
+    "firstSeen": "2023-01-01",
+    "active": true,
+    "victimCount": 19
+  },
+  {
+    "slug": "rhysida",
+    "name": "Rhysida",
+    "description": "Group targeting education, healthcare, and government sectors.",
+    "firstSeen": "2023-05-01",
+    "active": true,
+    "victimCount": 21
+  },
+  {
+    "slug": "hunters-international",
+    "name": "Hunters International",
+    "description": "Group believed to have inherited tooling from earlier Hive-linked operations.",
+    "firstSeen": "2023-10-01",
+    "active": true,
+    "victimCount": 26
+  },
+  {
+    "slug": "qilin",
+    "name": "Qilin",
+    "description": "RaaS operation offering affiliates a leak-site and negotiation portal.",
+    "firstSeen": "2022-08-01",
+    "active": true,
+    "victimCount": 22
+  }
+]

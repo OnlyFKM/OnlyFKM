@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "v-142",
+    "name": "Sterling Legal Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Netherlands",
+    "sector": "Retail",
+    "discoveredAt": "2026-09-16",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-53",
+    "name": "Ironbridge Systems Inc.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Spain",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-09-16",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-69",
+    "name": "Crestline Retail Holdings",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Germany",
+    "sector": "Energy",
+    "discoveredAt": "2026-09-13",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-162",
+    "name": "Wavefront Systems Inc.",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Germany",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-09-10",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-29",
+    "name": "Wavefront University",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Germany",
+    "sector": "Government",
+    "discoveredAt": "2026-09-09",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-136",
+    "name": "Thornbury Hospitality Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Japan",
+    "sector": "Government",
+    "discoveredAt": "2026-09-08",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-12",
+    "name": "Cascade Financial Partners",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "United States",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-09-08",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-140",
+    "name": "Northgate Financial Partners",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Italy",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-09-05",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-139",
+    "name": "Cobalt Logistics",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Japan",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-09-03",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-76",
+    "name": "Northgate Logistics",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "France",
+    "sector": "Government",
+    "discoveredAt": "2026-09-03",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-8",
+    "name": "Wavefront University",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "United States",
+    "sector": "Technology",
+    "discoveredAt": "2026-09-03",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-174",
+    "name": "Foundry Legal Group",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Netherlands",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-09-01",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-109",
+    "name": "Fieldstone Industries",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "United States",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-08-31",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-87",
+    "name": "Vantage Freight Services",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "United Kingdom",
+    "sector": "Retail",
+    "discoveredAt": "2026-08-31",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-179",
+    "name": "Lumen Medical Center",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Netherlands",
+    "sector": "Energy",
+    "discoveredAt": "2026-08-30",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-113",
+    "name": "Atlas Energy Corp.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Mexico",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-08-28",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-170",
+    "name": "Thornbury Construction Ltd.",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Japan",
+    "sector": "Finance",
+    "discoveredAt": "2026-08-27",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-132",
+    "name": "Wavefront Legal Group",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Netherlands",
+    "sector": "Construction",
+    "discoveredAt": "2026-08-26",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-49",
+    "name": "Meridian Financial Partners",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Brazil",
+    "sector": "Government",
+    "discoveredAt": "2026-08-25",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-124",
+    "name": "Atlas Freight Services",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "United States",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-08-24",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-155",
+    "name": "Summit Legal Group",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "France",
+    "sector": "Education",
+    "discoveredAt": "2026-08-23",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-19",
+    "name": "Lumen Credit Union",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Netherlands",
+    "sector": "Government",
+    "discoveredAt": "2026-08-23",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-36",
+    "name": "Wavefront Systems Inc.",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Germany",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-08-22",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-146",
+    "name": "Sterling Manufacturing Co.",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Canada",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-08-20",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-105",
+    "name": "Crestline Hospitality Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "United States",
+    "sector": "Construction",
+    "discoveredAt": "2026-08-18",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-3",
+    "name": "Wavefront Freight Services",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Energy",
+    "discoveredAt": "2026-08-18",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-118",
+    "name": "Foundry Manufacturing Co.",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "United States",
+    "sector": "Finance",
+    "discoveredAt": "2026-08-16",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-97",
+    "name": "Wavefront Manufacturing Co.",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Germany",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-08-15",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-68",
+    "name": "Bluepeak Health Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Canada",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-08-15",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-48",
+    "name": "Cascade Legal Group",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Japan",
+    "sector": "Education",
+    "discoveredAt": "2026-08-13",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-9",
+    "name": "Crestline Medical Center",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Australia",
+    "sector": "Education",
+    "discoveredAt": "2026-08-13",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-58",
+    "name": "Fieldstone Construction Ltd.",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Brazil",
+    "sector": "Retail",
+    "discoveredAt": "2026-08-10",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-107",
+    "name": "Meridian Hospitality Group",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Australia",
+    "sector": "Education",
+    "discoveredAt": "2026-08-08",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-41",
+    "name": "Redwood Manufacturing Co.",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Spain",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-08-07",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-7",
+    "name": "Crestline University",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Mexico",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-08-07",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-98",
+    "name": "Vantage Retail Holdings",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Brazil",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-08-06",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-6",
+    "name": "Wavefront Legal Group",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Japan",
+    "sector": "Finance",
+    "discoveredAt": "2026-08-06",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-123",
+    "name": "Harborview University",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Mexico",
+    "sector": "Finance",
+    "discoveredAt": "2026-08-05",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-21",
+    "name": "Ironbridge Hospitality Group",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "United Kingdom",
+    "sector": "Education",
+    "discoveredAt": "2026-08-05",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-83",
+    "name": "Sterling Financial Partners",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Mexico",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-08-01",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-27",
+    "name": "Vantage Technologies",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Canada",
+    "sector": "Construction",
+    "discoveredAt": "2026-08-01",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-168",
+    "name": "Wavefront Industries",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Spain",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-07-31",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-106",
+    "name": "Anchor Technologies",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Germany",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-07-31",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-74",
+    "name": "Anchor Freight Services",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "United States",
+    "sector": "Finance",
+    "discoveredAt": "2026-07-29",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-72",
+    "name": "Wavefront Freight Services",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "United Kingdom",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-27",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-163",
+    "name": "Harborview Systems Inc.",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Japan",
+    "sector": "Construction",
+    "discoveredAt": "2026-07-23",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-141",
+    "name": "Fieldstone Credit Union",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Japan",
+    "sector": "Technology",
+    "discoveredAt": "2026-07-23",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-100",
+    "name": "Vantage Systems Inc.",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "France",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-07-23",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-39",
+    "name": "Thornbury University",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "United States",
+    "sector": "Construction",
+    "discoveredAt": "2026-07-23",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-167",
+    "name": "Cascade Retail Holdings",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Italy",
+    "sector": "Construction",
+    "discoveredAt": "2026-07-21",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-45",
+    "name": "Crestline Manufacturing Co.",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "France",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-19",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-158",
+    "name": "Riverside Health Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Netherlands",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-07-18",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-103",
+    "name": "Cascade Manufacturing Co.",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "France",
+    "sector": "Energy",
+    "discoveredAt": "2026-07-18",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-84",
+    "name": "Cascade Industries",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Italy",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-18",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-35",
+    "name": "Harborview Energy Corp.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "United States",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-07-18",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-40",
+    "name": "Bluepeak Logistics",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Netherlands",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-07-17",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-73",
+    "name": "Northgate Medical Center",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Brazil",
+    "sector": "Energy",
+    "discoveredAt": "2026-07-15",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-26",
+    "name": "Foundry Logistics",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "United Kingdom",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-15",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-42",
+    "name": "Wavefront Industries",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Italy",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-07-12",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-159",
+    "name": "Harborview Technologies",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Netherlands",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-07-10",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-57",
+    "name": "Ironbridge Credit Union",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Mexico",
+    "sector": "Finance",
+    "discoveredAt": "2026-07-10",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-11",
+    "name": "Crestline Freight Services",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Spain",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-07-10",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-13",
+    "name": "Redwood University",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "United States",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-07-09",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-151",
+    "name": "Ironbridge Logistics",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "United States",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-08",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-2",
+    "name": "Atlas Systems Inc.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Italy",
+    "sector": "Construction",
+    "discoveredAt": "2026-07-08",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-88",
+    "name": "Sterling Health Group",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Australia",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-07-07",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-63",
+    "name": "Vantage Industries",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Germany",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-07-06",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-164",
+    "name": "Atlas Freight Services",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Australia",
+    "sector": "Retail",
+    "discoveredAt": "2026-07-01",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-108",
+    "name": "Wavefront University",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Mexico",
+    "sector": "Finance",
+    "discoveredAt": "2026-07-01",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-161",
+    "name": "Bluepeak Technologies",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-06-30",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-95",
+    "name": "Riverside Logistics",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Canada",
+    "sector": "Retail",
+    "discoveredAt": "2026-06-29",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-82",
+    "name": "Thornbury Financial Partners",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Brazil",
+    "sector": "Technology",
+    "discoveredAt": "2026-06-29",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-61",
+    "name": "Vantage Financial Partners",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Italy",
+    "sector": "Education",
+    "discoveredAt": "2026-06-29",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-177",
+    "name": "Fieldstone Financial Partners",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Italy",
+    "sector": "Government",
+    "discoveredAt": "2026-06-27",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-75",
+    "name": "Thornbury Technologies",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Japan",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-06-27",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-86",
+    "name": "Northgate Industries",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Australia",
+    "sector": "Technology",
+    "discoveredAt": "2026-06-26",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-137",
+    "name": "Thornbury Manufacturing Co.",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Italy",
+    "sector": "Retail",
+    "discoveredAt": "2026-06-23",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-81",
+    "name": "Crestline Legal Group",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Germany",
+    "sector": "Finance",
+    "discoveredAt": "2026-06-23",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-22",
+    "name": "Northgate Hospitality Group",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "United States",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-06-23",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-120",
+    "name": "Cascade Health Group",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Brazil",
+    "sector": "Finance",
+    "discoveredAt": "2026-06-22",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-116",
+    "name": "Thornbury Manufacturing Co.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Spain",
+    "sector": "Education",
+    "discoveredAt": "2026-06-17",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-78",
+    "name": "Wavefront Health Group",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Brazil",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-06-16",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-93",
+    "name": "Ironbridge Financial Partners",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Netherlands",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-06-14",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-70",
+    "name": "Atlas Construction Ltd.",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Italy",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-06-13",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-99",
+    "name": "Vantage Logistics",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "United Kingdom",
+    "sector": "Technology",
+    "discoveredAt": "2026-06-10",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-92",
+    "name": "Sterling Systems Inc.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "United Kingdom",
+    "sector": "Energy",
+    "discoveredAt": "2026-06-10",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-157",
+    "name": "Atlas Logistics",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "United Kingdom",
+    "sector": "Finance",
+    "discoveredAt": "2026-06-09",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-89",
+    "name": "Fieldstone Retail Holdings",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Japan",
+    "sector": "Retail",
+    "discoveredAt": "2026-06-09",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-23",
+    "name": "Cobalt Medical Center",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "United States",
+    "sector": "Energy",
+    "discoveredAt": "2026-06-07",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-127",
+    "name": "Lumen Industries",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Canada",
+    "sector": "Finance",
+    "discoveredAt": "2026-06-06",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-144",
+    "name": "Wavefront Construction Ltd.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Netherlands",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-06-05",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-64",
+    "name": "Foundry Systems Inc.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Netherlands",
+    "sector": "Education",
+    "discoveredAt": "2026-06-05",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-14",
+    "name": "Bluepeak Construction Ltd.",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "United Kingdom",
+    "sector": "Finance",
+    "discoveredAt": "2026-06-05",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-65",
+    "name": "Vantage Credit Union",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Canada",
+    "sector": "Construction",
+    "discoveredAt": "2026-06-02",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-111",
+    "name": "Thornbury Medical Center",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Italy",
+    "sector": "Government",
+    "discoveredAt": "2026-06-01",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-67",
+    "name": "Riverside Financial Partners",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Netherlands",
+    "sector": "Retail",
+    "discoveredAt": "2026-05-31",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-4",
+    "name": "Fieldstone Manufacturing Co.",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "France",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-05-31",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-176",
+    "name": "Bluepeak Medical Center",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Japan",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-05-29",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-117",
+    "name": "Fieldstone Systems Inc.",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "United States",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-05-28",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-37",
+    "name": "Ironbridge Credit Union",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "United States",
+    "sector": "Retail",
+    "discoveredAt": "2026-05-28",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-156",
+    "name": "Foundry Retail Holdings",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Canada",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-05-27",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-44",
+    "name": "Vantage Credit Union",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Germany",
+    "sector": "Energy",
+    "discoveredAt": "2026-05-26",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-166",
+    "name": "Riverside Legal Group",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "United Kingdom",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-05-24",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-149",
+    "name": "Redwood Health Group",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "United Kingdom",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-05-21",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-115",
+    "name": "Crestline Manufacturing Co.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Australia",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-05-21",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-114",
+    "name": "Wavefront Retail Holdings",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Canada",
+    "sector": "Energy",
+    "discoveredAt": "2026-05-21",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-52",
+    "name": "Anchor Logistics",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Mexico",
+    "sector": "Energy",
+    "discoveredAt": "2026-05-21",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-129",
+    "name": "Ironbridge Legal Group",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Spain",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-05-19",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-20",
+    "name": "Anchor Technologies",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Netherlands",
+    "sector": "Education",
+    "discoveredAt": "2026-05-19",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-17",
+    "name": "Northgate Logistics",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Australia",
+    "sector": "Energy",
+    "discoveredAt": "2026-05-18",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-18",
+    "name": "Wavefront Construction Ltd.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Netherlands",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-05-17",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-135",
+    "name": "Harborview Retail Holdings",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Mexico",
+    "sector": "Government",
+    "discoveredAt": "2026-05-15",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-46",
+    "name": "Vantage University",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "United States",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-05-13",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-25",
+    "name": "Cascade University",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Construction",
+    "discoveredAt": "2026-05-13",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-180",
+    "name": "Wavefront Medical Center",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Spain",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-05-10",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-104",
+    "name": "Riverside Construction Ltd.",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Brazil",
+    "sector": "Retail",
+    "discoveredAt": "2026-05-08",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-30",
+    "name": "Cascade Retail Holdings",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Australia",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-05-08",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-147",
+    "name": "Thornbury Manufacturing Co.",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Brazil",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-05-06",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-153",
+    "name": "Fieldstone Health Group",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Japan",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-05-02",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-148",
+    "name": "Bluepeak Freight Services",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Canada",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-05-01",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-143",
+    "name": "Harborview Financial Partners",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Spain",
+    "sector": "Technology",
+    "discoveredAt": "2026-05-01",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-77",
+    "name": "Anchor Industries",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Netherlands",
+    "sector": "Finance",
+    "discoveredAt": "2026-04-30",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-134",
+    "name": "Foundry Freight Services",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Italy",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-04-28",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-34",
+    "name": "Redwood Construction Ltd.",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Government",
+    "discoveredAt": "2026-04-27",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-150",
+    "name": "Wavefront Construction Ltd.",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Germany",
+    "sector": "Construction",
+    "discoveredAt": "2026-04-25",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-119",
+    "name": "Crestline Medical Center",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "United Kingdom",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-04-24",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-165",
+    "name": "Ironbridge Industries",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Australia",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-04-23",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-121",
+    "name": "Redwood Manufacturing Co.",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Spain",
+    "sector": "Technology",
+    "discoveredAt": "2026-04-22",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-110",
+    "name": "Atlas Technologies",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-04-21",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-54",
+    "name": "Wavefront Medical Center",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Spain",
+    "sector": "Education",
+    "discoveredAt": "2026-04-21",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-91",
+    "name": "Meridian Medical Center",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Netherlands",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-04-20",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-171",
+    "name": "Harborview Hospitality Group",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Netherlands",
+    "sector": "Education",
+    "discoveredAt": "2026-04-19",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-28",
+    "name": "Wavefront Industries",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "France",
+    "sector": "Construction",
+    "discoveredAt": "2026-04-19",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-32",
+    "name": "Northgate Energy Corp.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Germany",
+    "sector": "Construction",
+    "discoveredAt": "2026-04-16",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-31",
+    "name": "Cobalt University",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "France",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-04-14",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-169",
+    "name": "Vantage Logistics",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "France",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-04-12",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-66",
+    "name": "Cascade Construction Ltd.",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "France",
+    "sector": "Education",
+    "discoveredAt": "2026-04-12",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-1",
+    "name": "Fieldstone Freight Services",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Brazil",
+    "sector": "Construction",
+    "discoveredAt": "2026-04-11",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-71",
+    "name": "Lumen Health Group",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "France",
+    "sector": "Finance",
+    "discoveredAt": "2026-04-09",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-5",
+    "name": "Meridian Technologies",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "Australia",
+    "sector": "Construction",
+    "discoveredAt": "2026-04-08",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-130",
+    "name": "Northgate Legal Group",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Spain",
+    "sector": "Education",
+    "discoveredAt": "2026-04-07",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-62",
+    "name": "Thornbury Systems Inc.",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "France",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-04-07",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-24",
+    "name": "Wavefront Construction Ltd.",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "France",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-04-06",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-79",
+    "name": "Summit Manufacturing Co.",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Mexico",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-04-04",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-16",
+    "name": "Atlas Manufacturing Co.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Australia",
+    "sector": "Retail",
+    "discoveredAt": "2026-04-03",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-47",
+    "name": "Summit Construction Ltd.",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Netherlands",
+    "sector": "Legal Services",
+    "discoveredAt": "2026-04-02",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-38",
+    "name": "Redwood Retail Holdings",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Japan",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-31",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-178",
+    "name": "Atlas Energy Corp.",
+    "group": "Medusa",
+    "groupSlug": "medusa",
+    "country": "France",
+    "sector": "Construction",
+    "discoveredAt": "2026-03-28",
+    "description": "Listed on the Medusa leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-90",
+    "name": "Wavefront Manufacturing Co.",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Brazil",
+    "sector": "Retail",
+    "discoveredAt": "2026-03-26",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-10",
+    "name": "Foundry Retail Holdings",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Brazil",
+    "sector": "Government",
+    "discoveredAt": "2026-03-26",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-131",
+    "name": "Cobalt Systems Inc.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Brazil",
+    "sector": "Government",
+    "discoveredAt": "2026-03-22",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-172",
+    "name": "Foundry Construction Ltd.",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Canada",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-20",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-122",
+    "name": "Bluepeak Energy Corp.",
+    "group": "Black Basta",
+    "groupSlug": "blackbasta",
+    "country": "Spain",
+    "sector": "Energy",
+    "discoveredAt": "2026-03-19",
+    "description": "Listed on the Black Basta leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-102",
+    "name": "Cascade Credit Union",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "United Kingdom",
+    "sector": "Finance",
+    "discoveredAt": "2026-03-17",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-173",
+    "name": "Vantage Industries",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Japan",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-03-16",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-15",
+    "name": "Vantage Energy Corp.",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Australia",
+    "sector": "Government",
+    "discoveredAt": "2026-03-16",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-175",
+    "name": "Wavefront Health Group",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Canada",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-03-15",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-112",
+    "name": "Riverside Health Group",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Netherlands",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-03-14",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-145",
+    "name": "Bluepeak Industries",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Spain",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-12",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-60",
+    "name": "Wavefront Credit Union",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "United Kingdom",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-11",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-152",
+    "name": "Harborview Industries",
+    "group": "Clop",
+    "groupSlug": "clop",
+    "country": "Netherlands",
+    "sector": "Government",
+    "discoveredAt": "2026-03-10",
+    "description": "Listed on the Clop leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-85",
+    "name": "Anchor Manufacturing Co.",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "United States",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-06",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-160",
+    "name": "Anchor Freight Services",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Brazil",
+    "sector": "Government",
+    "discoveredAt": "2026-03-04",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-128",
+    "name": "Anchor Retail Holdings",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "France",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-03-03",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-55",
+    "name": "Harborview Credit Union",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "France",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-03-03",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-33",
+    "name": "Crestline Logistics",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Canada",
+    "sector": "Hospitality",
+    "discoveredAt": "2026-03-03",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-125",
+    "name": "Northgate Freight Services",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "United States",
+    "sector": "Government",
+    "discoveredAt": "2026-03-02",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-126",
+    "name": "Wavefront Energy Corp.",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "Canada",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-02-28",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-59",
+    "name": "Cascade Legal Group",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Germany",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-02-28",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-50",
+    "name": "Fieldstone Financial Partners",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "France",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-02-25",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-154",
+    "name": "Harborview Manufacturing Co.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Spain",
+    "sector": "Construction",
+    "discoveredAt": "2026-02-24",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-133",
+    "name": "Foundry Logistics",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "Netherlands",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-02-24",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-101",
+    "name": "Foundry Technologies",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Brazil",
+    "sector": "Healthcare",
+    "discoveredAt": "2026-02-22",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-138",
+    "name": "Cascade Manufacturing Co.",
+    "group": "Akira",
+    "groupSlug": "akira",
+    "country": "Mexico",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-02-19",
+    "description": "Listed on the Akira leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-94",
+    "name": "Bluepeak Technologies",
+    "group": "Qilin",
+    "groupSlug": "qilin",
+    "country": "United States",
+    "sector": "Energy",
+    "discoveredAt": "2026-02-18",
+    "description": "Listed on the Qilin leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-51",
+    "name": "Vantage Systems Inc.",
+    "group": "Hunters International",
+    "groupSlug": "hunters-international",
+    "country": "France",
+    "sector": "Logistics & Transportation",
+    "discoveredAt": "2026-02-18",
+    "description": "Listed on the Hunters International leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-80",
+    "name": "Foundry Technologies",
+    "group": "Play",
+    "groupSlug": "play",
+    "country": "Australia",
+    "sector": "Manufacturing",
+    "discoveredAt": "2026-02-16",
+    "description": "Listed on the Play leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-43",
+    "name": "Sterling Financial Partners",
+    "group": "LockBit",
+    "groupSlug": "lockbit",
+    "country": "Australia",
+    "sector": "Technology",
+    "discoveredAt": "2026-02-15",
+    "description": "Listed on the LockBit leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-96",
+    "name": "Wavefront Manufacturing Co.",
+    "group": "Rhysida",
+    "groupSlug": "rhysida",
+    "country": "Mexico",
+    "sector": "Energy",
+    "discoveredAt": "2026-02-13",
+    "description": "Listed on the Rhysida leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  },
+  {
+    "id": "v-56",
+    "name": "Atlas Manufacturing Co.",
+    "group": "ALPHV/BlackCat",
+    "groupSlug": "alphv-blackcat",
+    "country": "Mexico",
+    "sector": "Technology",
+    "discoveredAt": "2026-02-09",
+    "description": "Listed on the ALPHV/BlackCat leak site. Entry is for demonstration purposes only and does not reference a real organization."
+  }
+]
