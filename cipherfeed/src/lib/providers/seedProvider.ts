@@ -1,5 +1,6 @@
 import type {
   DataSource,
+  FilterOptions,
   RansomGroup,
   Stats,
   Victim,
@@ -122,5 +123,12 @@ export class SeedDataSource implements DataSource {
 
   async getVictimsByGroup(slug: string): Promise<Victim[]> {
     return victims.filter((v) => v.groupSlug === slug);
+  }
+
+  async getFilterOptions(): Promise<FilterOptions> {
+    return {
+      countries: [...new Set(victims.map((v) => v.country))].sort(),
+      sectors: [...new Set(victims.map((v) => v.sector))].sort(),
+    };
   }
 }

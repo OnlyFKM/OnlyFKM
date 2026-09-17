@@ -47,6 +47,11 @@ export type VictimPage = {
   pageSize: number;
 };
 
+export type FilterOptions = {
+  countries: string[];
+  sectors: string[];
+};
+
 export interface DataSource {
   getStats(): Promise<Stats>;
   getVictims(filter: VictimFilter): Promise<VictimPage>;
@@ -54,4 +59,5 @@ export interface DataSource {
   getGroups(): Promise<RansomGroup[]>;
   getGroup(slug: string): Promise<RansomGroup | null>;
   getVictimsByGroup(slug: string): Promise<Victim[]>;
+  getFilterOptions(): Promise<FilterOptions>;
 }

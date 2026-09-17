@@ -19,7 +19,7 @@ export default async function VictimsPage({
   const sp = await searchParams;
   const page = Number(sp.page ?? "1") || 1;
 
-  const [{ items, total, pageSize }, groups, stats] = await Promise.all([
+  const [{ items, total, pageSize }, groups, filterOptions] = await Promise.all([
     dataSource.getVictims({
       query: sp.q,
       group: sp.group,
@@ -29,7 +29,7 @@ export default async function VictimsPage({
       pageSize: 25,
     }),
     dataSource.getGroups(),
-    dataSource.getStats(),
+    dataSource.getFilterOptions(),
   ]);
 
   return (
@@ -43,8 +43,8 @@ export default async function VictimsPage({
 
       <Filters
         groups={groups.map((g) => ({ slug: g.slug, name: g.name }))}
-        countries={stats.topCountries.map((c) => c.country)}
-        sectors={stats.topSectors.map((s) => s.sector)}
+        countries={filterOptions.countries}
+        sectors={filterOptions.sectors}
       />
 
       <VictimTable victims={items} />

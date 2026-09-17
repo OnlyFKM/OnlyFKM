@@ -1,5 +1,6 @@
 import type {
   DataSource,
+  FilterOptions,
   RansomGroup,
   Stats,
   Victim,
@@ -154,6 +155,18 @@ export class LiveFeedDataSource implements DataSource {
       return all.filter((v) => v.groupSlug === slug);
     } catch {
       return this.fallback.getVictimsByGroup(slug);
+    }
+  }
+
+  async getFilterOptions(): Promise<FilterOptions> {
+    try {
+      const all = await this.fetchAllVictims();
+      return {
+        countries: [...new Set(all.map((v) => v.country))].sort(),
+        sectors: [...new Set(all.map((v) => v.sector))].sort(),
+      };
+    } catch {
+      return this.fallback.getFilterOptions();
     }
   }
 
