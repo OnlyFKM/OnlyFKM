@@ -1,4 +1,5 @@
 import type {
+  CountryCount,
   DataSource,
   FilterOptions,
   RansomGroup,
@@ -130,5 +131,12 @@ export class SeedDataSource implements DataSource {
       countries: [...new Set(victims.map((v) => v.country))].sort(),
       sectors: [...new Set(victims.map((v) => v.sector))].sort(),
     };
+  }
+
+  async getCountryCounts(): Promise<CountryCount[]> {
+    return topN(
+      victims.map((v) => v.country),
+      Number.POSITIVE_INFINITY
+    ).map(({ key, count }) => ({ country: key, count }));
   }
 }

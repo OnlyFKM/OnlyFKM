@@ -18,6 +18,9 @@ export function Navbar() {
           <Link href="/groups" className="hover:text-foreground transition-colors">
             Groups
           </Link>
+          <Link href="/map" className="hover:text-foreground transition-colors">
+            Map
+          </Link>
         </nav>
       </div>
     </header>

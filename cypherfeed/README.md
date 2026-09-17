@@ -15,7 +15,8 @@ threat actors.
 - **Dashboard** — totals, 30-day trend, top groups/countries/sectors, timeline chart.
 - **Victims** — searchable, filterable (group, country, sector), paginated table.
 - **Groups** — profile per ransomware group with its listed victims.
-- **Auto-refresh** — an open tab silently re-fetches every 5 minutes (`src/components/AutoRefresh.tsx`), no manual reload needed. Actual data freshness is still bounded by the data source's own cache (15 minutes for the live feed provider).
+- **Map** — interactive choropleth of victims by country (`react-simple-maps`); hover for a count, click to jump to that country's filtered victim list.
+- **Auto-refresh** — an open tab silently re-fetches every 15 minutes (`src/components/AutoRefresh.tsx`), no manual reload needed, matching the live feed provider's own cache window.
 
 ## Data sources
 
@@ -52,4 +53,4 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS · Recharts
+Next.js (App Router) · TypeScript · Tailwind CSS · Recharts · react-simple-maps

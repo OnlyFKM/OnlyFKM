@@ -1,4 +1,5 @@
 import type {
+  CountryCount,
   DataSource,
   FilterOptions,
   RansomGroup,
@@ -167,6 +168,19 @@ export class LiveFeedDataSource implements DataSource {
       };
     } catch {
       return this.fallback.getFilterOptions();
+    }
+  }
+
+  async getCountryCounts(): Promise<CountryCount[]> {
+    try {
+      const all = await this.fetchAllVictims();
+      const counts = new Map<string, number>();
+      for (const v of all) counts.set(v.country, (counts.get(v.country) ?? 0) + 1);
+      return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([country, count]) => ({ country, count }));
+    } catch {
+      return this.fallback.getCountryCounts();
     }
   }
 

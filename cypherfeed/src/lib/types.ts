@@ -52,6 +52,8 @@ export type FilterOptions = {
   sectors: string[];
 };
 
+export type CountryCount = { country: string; count: number };
+
 export interface DataSource {
   getStats(): Promise<Stats>;
   getVictims(filter: VictimFilter): Promise<VictimPage>;
@@ -60,4 +62,6 @@ export interface DataSource {
   getGroup(slug: string): Promise<RansomGroup | null>;
   getVictimsByGroup(slug: string): Promise<Victim[]>;
   getFilterOptions(): Promise<FilterOptions>;
+  /** Victim count per country, for every country present in the data (not just the top N). */
+  getCountryCounts(): Promise<CountryCount[]>;
 }
