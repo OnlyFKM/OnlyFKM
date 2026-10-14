@@ -13,6 +13,8 @@ const CONFIG_POR_DEFECTO = {
   urlBusqueda: "",
 
   // Pasos que se hacen en el portal para cada referencia, en orden. Acciones:
+  //   panelCliente: abre el panel de la barra superior, busca el cliente en la columna "Clientes" y entra en él
+  //                 (selector opcional = el botón que abre el panel).
   //   seleccionar: elige una opción en un desplegable (selector vacío = el <select> que tenga esa opción).
   //   clic:        pulsa el elemento con ese texto visible (y/o que encaje con el selector).
   //   escribir:    escribe el texto en un cuadro (selector vacío = el primer cuadro de búsqueda visible).
@@ -20,7 +22,7 @@ const CONFIG_POR_DEFECTO = {
   //   esperar:     espera los milisegundos indicados en "texto".
   // Marcadores en "texto": {cliente}, {ref}, {modo} (según el tipo de referencia) y {tipo}.
   pasos: [
-    { accion: "seleccionar", selector: "", texto: "{cliente}" },
+    { accion: "panelCliente", selector: "", texto: "{cliente}" },
     { accion: "clic", selector: "", texto: "{modo}" },
     { accion: "clic", selector: "", texto: "Amenazas" },
     { accion: "clic", selector: "", texto: "Listado de amenazas" },
@@ -51,6 +53,11 @@ async function cargarConfig() {
   const resultado = { ...CONFIG_POR_DEFECTO, ...(config || {}) };
   // La URL de ejemplo de versiones anteriores equivale a no tener URL.
   if (/portal\.ejemplo\.com/.test(resultado.urlBusqueda)) resultado.urlBusqueda = "";
+  // El primer paso por defecto de versiones anteriores (desplegable nativo) pasa a ser el panel de clientes.
+  const p0 = resultado.pasos && resultado.pasos[0];
+  if (p0 && p0.accion === "seleccionar" && !p0.selector && p0.texto === "{cliente}") {
+    resultado.pasos = [{ ...p0, accion: "panelCliente" }, ...resultado.pasos.slice(1)];
+  }
   return resultado;
 }
 

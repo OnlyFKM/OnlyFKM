@@ -35,7 +35,7 @@ y repite lo que harías a mano. Pasos por defecto:
 
 | # | Acción | Texto | Qué hace |
 |---|---|---|---|
-| 1 | seleccionar | `{cliente}` | Elige el cliente en el desplegable |
+| 1 | panelCliente | `{cliente}` | Abre el panel de la barra superior (OBs / Clientes / Unidades), escribe el cliente en el buscador de **Clientes**, lo pulsa y, si hace falta, entra con el icono ↗ |
 | 2 | clic | `{modo}` | Activa el modo según el tipo de referencia (`D` → *Digital Risk Protection*) |
 | 3 | clic | `Amenazas` | Abre el apartado Amenazas |
 | 4 | clic | `Listado de amenazas` | Entra en el listado |
@@ -44,7 +44,7 @@ y repite lo que harías a mano. Pasos por defecto:
 
 Los clics se hacen **por el texto visible**, así que normalmente no hace falta ningún selector CSS. Solo hace falta uno si:
 
-- el desplegable de clientes no es un desplegable normal (por ejemplo, uno con buscador): pon su selector en el paso 1;
+- no encuentra el botón de la barra superior que abre el panel de clientes (el que pone "Global"): pon su selector en el paso 1;
 - hay varios elementos con el mismo texto y pulsa el que no es: pon un selector en ese paso;
 - el cuadro de búsqueda no es el primero de la página: pon su selector en el paso 5.
 

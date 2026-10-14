@@ -1,6 +1,8 @@
 importScripts("clientes.js", "common.js");
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+// Pestañas que abre la propia extensión (para no confundirlas con las que abre el portal).
+const propias = new Set();
 
 chrome.runtime.onMessage.addListener((msg, _sender, responder) => {
   if (msg && msg.tipo === "abrir") {
@@ -66,8 +68,27 @@ async function abrirUna(config, cliente, ref) {
   const valores = { cliente: cliente.nombre, ref, modo, tipo };
 
   const tab = await chrome.tabs.create({ url: config.urlBusqueda, active });
-  await esperarCarga(tab.id, config.timeoutMs);
+  propias.add(tab.id);
+  let tabId = tab.id;
+  await esperarCarga(tabId, config.timeoutMs);
 
+  // Si un paso abre una pestaña nueva (p. ej. el icono ↗ de entrar en el cliente),
+  // se siguen los pasos en ella y se cierra la anterior.
+  const nuevas = [];
+  const alCrear = (t) => nuevas.push(t);
+  chrome.tabs.onCreated.addListener(alCrear);
+  try {
+    tabId = await hacerPasos(config, cliente, valores, tabId, nuevas);
+  } finally {
+    chrome.tabs.onCreated.removeListener(alCrear);
+    propias.delete(tabId);
+  }
+}
+
+// Acciones que pueden recargar la página: si Chrome corta el paso por la navegación, se da por hecho.
+const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente"];
+
+async function hacerPasos(config, cliente, valores, tabId, nuevas) {
   for (const [n, paso] of config.pasos.entries()) {
     if (paso.accion === "esperar") {
       await esperar(Number(paso.texto) || 1000);
@@ -81,20 +102,42 @@ async function abrirUna(config, cliente, ref) {
         : [plantilla.replace(/\{(cliente|ref|modo|tipo)\}/g, (_, k) => valores[k] || "")];
 
     const args = [paso.accion, paso.selector || "", textos, config.timeoutMs];
-    let r = await ejecutar(tab.id, pasoEnPagina, args);
-    if (!r.ok && r.navegando) {
+    const navega = ACCIONES_QUE_NAVEGAN.includes(paso.accion);
+    let r = await ejecutar(tabId, pasoEnPagina, args);
+    if (!r.ok && r.navegando && !navega) {
       // La página se estaba recargando: se espera a que termine y se repite el paso.
-      await esperarCarga(tab.id, config.timeoutMs);
-      r = await ejecutar(tab.id, pasoEnPagina, args);
+      await esperarCarga(tabId, config.timeoutMs);
+      r = await ejecutar(tabId, pasoEnPagina, args);
     }
-    if (!r.ok && !(r.navegando && ["clic", "enviar", "seleccionar"].includes(paso.accion))) {
+    if (!r.ok && !(r.navegando && navega)) {
       throw new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
     }
 
     // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
     await esperar(config.esperaEntrePasosMs);
-    await esperarCarga(tab.id, config.timeoutMs);
+    // Pestaña abierta por la página durante el paso: la que indique esta pestaña como origen
+    // o, si el navegador no lo indica bien, cualquier pestaña nueva del mismo portal.
+    const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, origenDe(config.urlBusqueda));
+    if (abierta) {
+      const anterior = tabId;
+      tabId = abierta.id;
+      propias.add(tabId);
+      propias.delete(anterior);
+      chrome.tabs.remove(anterior).catch(() => {});
+    }
+    await esperarCarga(tabId, config.timeoutMs);
   }
+  return tabId;
+}
+
+async function pestanaAbiertaPorElPaso(creadas, tabId, origen) {
+  for (const t of creadas.reverse()) {
+    if (propias.has(t.id)) continue;
+    const info = await chrome.tabs.get(t.id).catch(() => null);
+    if (!info) continue;
+    if (info.openerTabId === tabId || origenDe(info.pendingUrl || info.url || "") === origen) return info;
+  }
+  return null;
 }
 
 async function ejecutar(tabId, func, args) {
@@ -223,6 +266,104 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs) {
     const opcion = await esperarA(() => porTexto("[role=option],li,option,a,span,div", { excluir: el }));
     if (!opcion) return { ok: false, error: `"${textos[0]}" no aparece en el desplegable` };
     pulsar(opcion);
+    return { ok: true };
+  }
+
+  if (accion === "panelCliente") {
+    // Panel de selección del portal: botón en la barra superior que abre columnas
+    // "OBs | Clientes | Unidades", cada una con su cuadro "Buscar" y su lista.
+    const rect = (e) => e.getBoundingClientRect();
+    const cabecera = () =>
+      [...document.querySelectorAll("h1,h2,h3,h4,h5,h6,div,span,p,strong,b,label,th")]
+        .filter((e) => visible(e) && /^clientes\b/.test(textoDe(e)) && textoDe(e).length < 80)
+        .sort((a, b) => textoDe(a).length - textoDe(b).length)[0];
+    // Cuadro de búsqueda de la columna Clientes: el que está debajo de su título y más alineado con él.
+    const buscadorClientes = () => {
+      const h = cabecera();
+      if (!h) return null;
+      const rh = rect(h);
+      return [...document.querySelectorAll("input")]
+        .filter((i) => visible(i) && !i.disabled && rect(i).top >= rh.top - 5)
+        .sort(
+          (a, b) =>
+            Math.abs(rect(a).left - rh.left) + Math.abs(rect(a).top - rh.bottom) / 4 -
+            (Math.abs(rect(b).left - rh.left) + Math.abs(rect(b).top - rh.bottom) / 4)
+        )[0];
+    };
+
+    if (!buscadorClientes()) {
+      let boton = selector ? document.querySelector(selector) : null;
+      if (!boton) {
+        const arriba = [...document.querySelectorAll("button,a,[role=button],[aria-expanded],[aria-haspopup],li,div,span")].filter(
+          (e) => visible(e) && rect(e).top < 90 && rect(e).bottom < 130 && textoDe(e) && textoDe(e).length < 60 && !/plataforma/.test(textoDe(e))
+        );
+        const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
+        boton =
+          arriba.find((e) => e.hasAttribute("aria-expanded") || e.hasAttribute("aria-haspopup")) ||
+          masInterno(arriba.filter((e) => textoDe(e) === "global")) ||
+          arriba.find((e) => e.tagName === "BUTTON");
+      }
+      if (!boton) return { ok: false, error: "no se encontró el botón que abre el panel de clientes (pon su selector en el paso)" };
+      pulsar(boton);
+    }
+    const input = await esperarA(buscadorClientes);
+    if (!input) return { ok: false, error: 'no se abrió el panel con la columna "Clientes"' };
+
+    // Elemento de la lista de clientes (debajo del buscador y en su misma columna).
+    const itemCliente = (t) => {
+      const ri = rect(input);
+      const els = [...document.querySelectorAll("li,a,div,span,p,td,button,[role=option]")].filter((e) => {
+        if (!visible(e)) return false;
+        const r = rect(e);
+        const txt = textoDe(e);
+        // Misma columna: empieza cerca del borde izquierdo del buscador (puede ser más ancho que él).
+        const enColumna = r.left >= ri.left - 30 && r.left <= ri.left + Math.max(60, ri.width * 0.6);
+        return r.top >= ri.bottom - 2 && enColumna && txt && txt.length < 150;
+      });
+      const nombreDe = (e) => [textoDe(e), norm(e.getAttribute("title"))];
+      const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
+      const exactos = els.filter((e) => nombreDe(e).includes(t));
+      if (exactos.length) return masInterno(exactos);
+      // Nombres recortados en pantalla ("ADMINISTRADOR DE IN...").
+      const recortados = els.filter((e) => {
+        const m = textoDe(e).match(/^(.*?)\s*(\.\.\.|…)$/);
+        return m && m[1].length >= 4 && t.startsWith(m[1]);
+      });
+      if (recortados.length) return masInterno(recortados);
+      const parecidos = els.filter((e) => textoDe(e).includes(t)).sort((a, b) => textoDe(a).length - textoDe(b).length);
+      return parecidos[0] || null;
+    };
+
+    let item = null;
+    for (const original of textos.filter((x) => norm(x))) {
+      const t = norm(original);
+      escribirEn(input, original);
+      input.dispatchEvent(new KeyboardEvent("keyup", { key: original.slice(-1), bubbles: true }));
+      const limite = Date.now() + Math.min(timeoutMs, 6000);
+      while (!item && Date.now() < limite) {
+        await dormir(300);
+        item = itemCliente(t);
+      }
+      if (item) break;
+    }
+    if (!item) return { ok: false, error: `el cliente "${textos[0]}" no aparece en el panel (revisa su "Valor en desplegable")` };
+
+    pulsar(item);
+    await dormir(1200);
+    // Si el panel sigue abierto, se entra con el icono ↗ de la fila del cliente.
+    if (item.isConnected && visible(item)) {
+      let fila = item;
+      for (let i = 0; i < 3 && fila.parentElement && rect(fila.parentElement).height < 60; i++) fila = fila.parentElement;
+      // El icono puede estar oculto hasta pasar el ratón: se aceptan también ocultos, prefiriendo los visibles.
+      const iconos = [
+        ...[...fila.querySelectorAll("a[href],button,svg,i,img,[class*=icon],[class*=Icon],[class*=external]")].filter(
+          (e) => e !== item && !e.contains(item) && !item.contains(e)
+        ),
+        ...item.querySelectorAll("a[href],svg,i,[class*=icon],[class*=external]")
+      ];
+      const icono = iconos.find(visible) || iconos[0];
+      if (icono) pulsar(icono.closest("a,button") || icono);
+    }
     return { ok: true };
   }
 

@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const CAMPOS_TEXTO = ["urlPlantilla", "urlBusqueda", "tipoPorDefecto"];
 const CAMPOS_NUMERO = ["esperaEntrePasosMs", "timeoutMs", "retardoEntrePestanasMs"];
-const ACCIONES = ["seleccionar", "clic", "escribir", "enviar", "esperar"];
+const ACCIONES = ["panelCliente", "seleccionar", "clic", "escribir", "enviar", "esperar"];
 const CAMPOS_CHECK = ["enSecuencia", "activarPestanas"];
 const COLUMNAS = ["nombre", "codigo", "valor", "alias", "patron"];
 

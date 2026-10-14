@@ -168,7 +168,7 @@ const CLIENTES_INICIALES = [
   {"nombre": "Urbaser Portugal", "valor": "", "alias": "", "codigo": "URBPT", "patron": ""},
   {"nombre": "Urbaser USA", "valor": "", "alias": "", "codigo": "URBUS", "patron": ""},
   {"nombre": "Viscofan", "valor": "", "alias": "", "codigo": "VISCO", "patron": ""},
-  {"nombre": "Xunta de Galicia - Acuerdo Marco", "valor": "", "alias": "", "codigo": "XGAM", "patron": ""}
+  {"nombre": "Xunta de Galicia - Acuerdo Marco", "valor": "Acuerdo Marco Xunta de Galicia", "alias": "", "codigo": "XGAM", "patron": ""}
 ];
 
 if (typeof module !== "undefined") module.exports = { CLIENTES_INICIALES };
