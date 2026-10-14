@@ -13,7 +13,8 @@ const CONFIG_POR_DEFECTO = {
   urlBusqueda: "",
 
   // Pasos que se hacen en el portal para cada referencia, en orden. Acciones:
-  //   panelCliente: abre el panel de la barra superior, busca el cliente en la columna "Clientes" y entra en él
+  //   panelCliente: abre el panel de la barra superior y recorre sus columnas en cascada:
+  //                 OB (obPanel) -> cliente (escrito en el buscador de "Clientes") -> unidad -> entrar
   //                 (selector opcional = el botón que abre el panel).
   //   seleccionar: elige una opción en un desplegable (selector vacío = el <select> que tenga esa opción).
   //   clic:        pulsa el elemento con ese texto visible (y/o que encaje con el selector).
@@ -29,6 +30,8 @@ const CONFIG_POR_DEFECTO = {
     { accion: "escribir", selector: "", texto: "{ref}" },
     { accion: "enviar", selector: "", texto: "" }
   ],
+  // OB que se pulsa en el panel antes de buscar el cliente (desbloquea la columna Clientes).
+  obPanel: "Global",
   esperaEntrePasosMs: 1500,
   timeoutMs: 20000,
   enSecuencia: true,

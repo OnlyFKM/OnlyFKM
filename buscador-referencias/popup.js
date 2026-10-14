@@ -157,6 +157,16 @@ async function mostrarRegistro() {
     linea.className = "aviso";
     linea.textContent = e.cliente ? `• ${e.cliente} / ${e.ref}: ${e.error}` : `• ${e.ref}: ${e.error}`;
     div.append(linea);
+    if (e.traza && e.traza.length) {
+      // Lo que llegó a hacer antes de fallar, para saber dónde se quedó.
+      const det = document.createElement("details");
+      const sum = document.createElement("summary");
+      sum.textContent = "Ver qué hizo";
+      const pre = document.createElement("pre");
+      pre.textContent = e.traza.join("\n");
+      det.append(sum, pre);
+      div.append(det);
+    }
   }
   chrome.action.setBadgeText({ text: "" });
 }

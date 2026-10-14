@@ -35,7 +35,7 @@ y repite lo que harías a mano. Pasos por defecto:
 
 | # | Acción | Texto | Qué hace |
 |---|---|---|---|
-| 1 | panelCliente | `{cliente}` | Abre el panel de la barra superior (OBs / Clientes / Unidades), escribe el cliente en el buscador de **Clientes**, lo pulsa y, si hace falta, entra con el icono ↗ |
+| 1 | panelCliente | `{cliente}` | Abre el panel de la barra superior y lo recorre en cascada: pulsa el OB (*Global*, se cambia en Opciones) → escribe el cliente en el buscador de **Clientes** y lo pulsa → pulsa la unidad que se llame como el cliente (o la primera) → si el panel sigue abierto, entra con el icono ↗ |
 | 2 | clic | `{modo}` | Activa el modo según el tipo de referencia (`D` → *Digital Risk Protection*) |
 | 3 | clic | `Amenazas` | Abre el apartado Amenazas |
 | 4 | clic | `Listado de amenazas` | Entra en el listado |
@@ -97,6 +97,7 @@ el popup muestra un error con las referencias a las que no se les encontró clie
 cuadro de texto para que las corrijas (por ejemplo `CLIENTE; REFERENCIA`) y las vuelvas a lanzar.
 
 Si alguna búsqueda falla en el portal, el icono muestra un `!` y el popup indica qué referencia falló y por qué.
+Debajo de cada error, **Ver qué hizo** muestra paso a paso lo que llegó a hacer la extensión antes de fallar.
 
 ## Pasar la configuración de Chrome a Edge
 

@@ -28,7 +28,7 @@ async function abrirTodas(items, sinCliente, urlInicio) {
 
     const tarea = abrirUna(config, cliente, ref)
       .then(() => registro.push({ ref, cliente: cliente.nombre, ok: true }))
-      .catch((e) => registro.push({ ref, cliente: cliente.nombre, ok: false, error: e.message }))
+      .catch((e) => registro.push({ ref, cliente: cliente.nombre, ok: false, error: e.message, traza: e.traza }))
       .then(() => guardarRegistro());
 
     // En modo formulario y en secuencia, se espera a que termine cada búsqueda antes de la siguiente
@@ -89,6 +89,7 @@ async function abrirUna(config, cliente, ref) {
 const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente"];
 
 async function hacerPasos(config, cliente, valores, tabId, nuevas) {
+  const traza = []; // lo que se ha hecho, para mostrarlo en el popup si algo falla
   for (const [n, paso] of config.pasos.entries()) {
     if (paso.accion === "esperar") {
       await esperar(Number(paso.texto) || 1000);
@@ -101,7 +102,7 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
         ? [cliente.nombre, cliente.valor].filter(Boolean)
         : [plantilla.replace(/\{(cliente|ref|modo|tipo)\}/g, (_, k) => valores[k] || "")];
 
-    const args = [paso.accion, paso.selector || "", textos, config.timeoutMs];
+    const args = [paso.accion, paso.selector || "", textos, config.timeoutMs, { ob: config.obPanel }];
     const navega = ACCIONES_QUE_NAVEGAN.includes(paso.accion);
     let r = await ejecutar(tabId, pasoEnPagina, args);
     if (!r.ok && r.navegando && !navega) {
@@ -110,8 +111,12 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
       r = await ejecutar(tabId, pasoEnPagina, args);
     }
     if (!r.ok && !(r.navegando && navega)) {
-      throw new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
+      const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
+      error.traza = [...traza, ...(r.traza || [])];
+      throw error;
     }
+    traza.push(`paso ${n + 1} ${paso.accion} ✓`);
+    for (const t of r.traza || []) traza.push(`   · ${t}`);
 
     // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
     await esperar(config.esperaEntrePasosMs);
@@ -175,7 +180,7 @@ function esperarCarga(tabId, timeoutMs) {
 
 // ---- Función que se inyecta en la página del portal (debe ser autocontenida) ----
 
-async function pasoEnPagina(accion, selector, textos, timeoutMs) {
+async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
   const norm = (s) =>
     String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
   const buscados = textos.map(norm).filter(Boolean);
@@ -270,91 +275,68 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs) {
   }
 
   if (accion === "panelCliente") {
-    // Panel de selección del portal: botón en la barra superior que abre columnas
-    // "OBs | Clientes | Unidades", cada una con su cuadro "Buscar" y su lista.
+    // Panel en cascada del portal: botón de la barra superior que abre las columnas
+    // "OBs | Clientes | Unidades". Pulsar un OB desbloquea Clientes y pulsar un cliente desbloquea Unidades.
+    const traza = [];
     const rect = (e) => e.getBoundingClientRect();
-    const cabecera = () =>
-      [...document.querySelectorAll("h1,h2,h3,h4,h5,h6,div,span,p,strong,b,label,th")]
-        .filter((e) => visible(e) && /^clientes\b/.test(textoDe(e)) && textoDe(e).length < 80)
+    const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
+    const corto = (e) => (e.innerText || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40);
+
+    // Columna por su título ("OBs", "Clientes Global", "Unidades AENA"): título, buscador y elementos de la lista.
+    const columna = (re) => {
+      const h = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6,div,span,p,strong,b,label,th")]
+        .filter((e) => visible(e) && re.test(textoDe(e)) && textoDe(e).length < 80)
         .sort((a, b) => textoDe(a).length - textoDe(b).length)[0];
-    // Cuadro de búsqueda de la columna Clientes: el que está debajo de su título y más alineado con él.
-    const buscadorClientes = () => {
-      const h = cabecera();
       if (!h) return null;
       const rh = rect(h);
-      return [...document.querySelectorAll("input")]
-        .filter((i) => visible(i) && !i.disabled && rect(i).top >= rh.top - 5)
-        .sort(
-          (a, b) =>
-            Math.abs(rect(a).left - rh.left) + Math.abs(rect(a).top - rh.bottom) / 4 -
-            (Math.abs(rect(b).left - rh.left) + Math.abs(rect(b).top - rh.bottom) / 4)
-        )[0];
+      const input = [...document.querySelectorAll("input")]
+        .filter((i) => visible(i) && rect(i).top >= rh.top - 5 && rect(i).top - rh.bottom < 120 && Math.abs(rect(i).left - rh.left) < 120)
+        .sort((a, b) => Math.abs(rect(a).left - rh.left) - Math.abs(rect(b).left - rh.left))[0];
+      const ref = input ? rect(input) : rh;
+      const izq = Math.min(ref.left, rh.left);
+      const items = () =>
+        [...document.querySelectorAll("li,a,div,span,p,td,button,[role=option],[role=treeitem]")].filter((e) => {
+          if (!visible(e) || e === input || e.contains(h) || e.contains(input)) return false;
+          const r = rect(e);
+          const txt = textoDe(e);
+          // Misma columna: empieza cerca del borde izquierdo de su buscador (puede ser más ancho que él).
+          const enColumna = r.left >= izq - 30 && r.left <= izq + Math.max(60, ref.width * 0.6);
+          return r.top >= ref.bottom - 2 && enColumna && txt && txt.length < 150;
+        });
+      return { h, input, items };
     };
+    const colClientes = () => columna(/^clientes\b/);
 
-    if (!buscadorClientes()) {
-      let boton = selector ? document.querySelector(selector) : null;
-      if (!boton) {
-        const arriba = [...document.querySelectorAll("button,a,[role=button],[aria-expanded],[aria-haspopup],li,div,span")].filter(
-          (e) => visible(e) && rect(e).top < 90 && rect(e).bottom < 130 && textoDe(e) && textoDe(e).length < 60 && !/plataforma/.test(textoDe(e))
-        );
-        const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
-        boton =
-          arriba.find((e) => e.hasAttribute("aria-expanded") || e.hasAttribute("aria-haspopup")) ||
-          masInterno(arriba.filter((e) => textoDe(e) === "global")) ||
-          arriba.find((e) => e.tagName === "BUTTON");
+    // Elemento de una lista cuyo nombre coincide (exacto, recortado con "..." o que lo contenga).
+    const buscarEn = (lista, nombres) => {
+      for (const t of nombres.map(norm).filter(Boolean)) {
+        const exactos = lista.filter((e) => textoDe(e) === t || norm(e.getAttribute("title")) === t);
+        if (exactos.length) return masInterno(exactos);
       }
-      if (!boton) return { ok: false, error: "no se encontró el botón que abre el panel de clientes (pon su selector en el paso)" };
-      pulsar(boton);
-    }
-    const input = await esperarA(buscadorClientes);
-    if (!input) return { ok: false, error: 'no se abrió el panel con la columna "Clientes"' };
-
-    // Elemento de la lista de clientes (debajo del buscador y en su misma columna).
-    const itemCliente = (t) => {
-      const ri = rect(input);
-      const els = [...document.querySelectorAll("li,a,div,span,p,td,button,[role=option]")].filter((e) => {
-        if (!visible(e)) return false;
-        const r = rect(e);
-        const txt = textoDe(e);
-        // Misma columna: empieza cerca del borde izquierdo del buscador (puede ser más ancho que él).
-        const enColumna = r.left >= ri.left - 30 && r.left <= ri.left + Math.max(60, ri.width * 0.6);
-        return r.top >= ri.bottom - 2 && enColumna && txt && txt.length < 150;
-      });
-      const nombreDe = (e) => [textoDe(e), norm(e.getAttribute("title"))];
-      const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
-      const exactos = els.filter((e) => nombreDe(e).includes(t));
-      if (exactos.length) return masInterno(exactos);
-      // Nombres recortados en pantalla ("ADMINISTRADOR DE IN...").
-      const recortados = els.filter((e) => {
-        const m = textoDe(e).match(/^(.*?)\s*(\.\.\.|…)$/);
-        return m && m[1].length >= 4 && t.startsWith(m[1]);
-      });
-      if (recortados.length) return masInterno(recortados);
-      const parecidos = els.filter((e) => textoDe(e).includes(t)).sort((a, b) => textoDe(a).length - textoDe(b).length);
-      return parecidos[0] || null;
+      for (const t of nombres.map(norm).filter(Boolean)) {
+        const recortados = lista.filter((e) => {
+          const m = textoDe(e).match(/^(.*?)\s*(\.\.\.|…)$/);
+          return m && m[1].length >= 4 && t.startsWith(m[1]);
+        });
+        if (recortados.length) return masInterno(recortados);
+        const parecidos = lista.filter((e) => textoDe(e).includes(t)).sort((a, b) => textoDe(a).length - textoDe(b).length);
+        if (parecidos.length) return parecidos[0];
+      }
+      return null;
     };
-
-    let item = null;
-    for (const original of textos.filter((x) => norm(x))) {
-      const t = norm(original);
-      escribirEn(input, original);
-      input.dispatchEvent(new KeyboardEvent("keyup", { key: original.slice(-1), bubbles: true }));
-      const limite = Date.now() + Math.min(timeoutMs, 6000);
-      while (!item && Date.now() < limite) {
-        await dormir(300);
-        item = itemCliente(t);
+    const esperarHasta = async (fn, ms) => {
+      const limite = Date.now() + ms;
+      let r = fn();
+      while (!r && Date.now() < limite) {
+        await dormir(250);
+        r = fn();
       }
-      if (item) break;
-    }
-    if (!item) return { ok: false, error: `el cliente "${textos[0]}" no aparece en el panel (revisa su "Valor en desplegable")` };
-
-    pulsar(item);
-    await dormir(1200);
-    // Si el panel sigue abierto, se entra con el icono ↗ de la fila del cliente.
-    if (item.isConnected && visible(item)) {
+      return r;
+    };
+    // Icono ↗ de la fila (puede estar oculto hasta pasar el ratón).
+    const pulsarIcono = (item) => {
       let fila = item;
       for (let i = 0; i < 3 && fila.parentElement && rect(fila.parentElement).height < 60; i++) fila = fila.parentElement;
-      // El icono puede estar oculto hasta pasar el ratón: se aceptan también ocultos, prefiriendo los visibles.
       const iconos = [
         ...[...fila.querySelectorAll("a[href],button,svg,i,img,[class*=icon],[class*=Icon],[class*=external]")].filter(
           (e) => e !== item && !e.contains(item) && !item.contains(e)
@@ -362,9 +344,102 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs) {
         ...item.querySelectorAll("a[href],svg,i,[class*=icon],[class*=external]")
       ];
       const icono = iconos.find(visible) || iconos[0];
-      if (icono) pulsar(icono.closest("a,button") || icono);
+      if (!icono) return false;
+      pulsar(icono.closest("a,button") || icono);
+      return true;
+    };
+    const fallo = (error) => ({ ok: false, error, traza });
+
+    // 1. Abrir el panel.
+    if (!colClientes()) {
+      let boton = selector ? document.querySelector(selector) : null;
+      if (!boton) {
+        const arriba = [...document.querySelectorAll("button,a,[role=button],[aria-expanded],[aria-haspopup],li,div,span")].filter(
+          (e) => visible(e) && rect(e).top < 90 && rect(e).bottom < 130 && textoDe(e) && textoDe(e).length < 60 && !/plataforma/.test(textoDe(e))
+        );
+        // Lo que está justo a la derecha del título "Plataforma Ciberseguridad".
+        const marca = masInterno(
+          [...document.querySelectorAll("a,span,div,h1,p")].filter((e) => visible(e) && rect(e).top < 90 && /^plataforma/.test(textoDe(e)))
+        );
+        const aLaDerecha = marca
+          ? masInterno(arriba.filter((e) => rect(e).left >= rect(marca).right - 2).sort((a, b) => rect(a).left - rect(b).left).slice(0, 3))
+          : null;
+        boton =
+          masInterno(arriba.filter((e) => textoDe(e) === "global")) ||
+          aLaDerecha ||
+          arriba.find((e) => e.hasAttribute("aria-expanded") || e.hasAttribute("aria-haspopup")) ||
+          arriba.find((e) => e.tagName === "BUTTON");
+        if (boton) boton = boton.closest("button,a,[role=button]") || boton;
+      }
+      if (!boton) return fallo("no se encontró el botón que abre el panel de clientes (pon su selector en el paso)");
+      traza.push(`abro el panel con "${corto(boton)}"`);
+      pulsar(boton);
     }
-    return { ok: true };
+    const panel = await esperarHasta(colClientes, timeoutMs);
+    if (!panel) return fallo('no se abrió el panel con la columna "Clientes"');
+    traza.push("panel abierto");
+
+    // 2. OB (desbloquea la columna Clientes).
+    const obs = columna(/^obs?\b/);
+    if (obs) {
+      const ob = buscarEn(obs.items(), [extra.ob || "Global"]);
+      if (ob) {
+        traza.push(`pulso el OB "${corto(ob)}"`);
+        pulsar(ob);
+      } else traza.push(`no veo el OB "${extra.ob || "Global"}"`);
+    } else traza.push("no veo la columna OBs");
+
+    // 3. Cliente: escribir en su buscador (cuando se desbloquee) y pulsarlo.
+    const inputCliente = await esperarHasta(() => {
+      const c = colClientes();
+      return c && c.input && !c.input.disabled && !c.input.readOnly ? c.input : null;
+    }, timeoutMs);
+    if (!inputCliente) {
+      const c = colClientes();
+      return fallo(c && c.input ? "el buscador de Clientes sigue bloqueado" : "no veo el buscador de la columna Clientes");
+    }
+    let cliente = null;
+    for (const original of textos.filter((x) => norm(x))) {
+      escribirEn(inputCliente, original);
+      inputCliente.dispatchEvent(new KeyboardEvent("keyup", { key: original.slice(-1), bubbles: true }));
+      traza.push(`escribo "${original}" en Clientes`);
+      cliente = await esperarHasta(() => buscarEn(colClientes().items(), [original]), Math.min(timeoutMs, 6000));
+      if (cliente) break;
+    }
+    if (!cliente) {
+      const vistos = colClientes().items().slice(0, 5).map(corto).join(" | ");
+      return fallo(`el cliente "${textos[0]}" no aparece en el panel (se ve: ${vistos || "nada"}). Revisa su "Valor en desplegable"`);
+    }
+    traza.push(`pulso el cliente "${corto(cliente)}"`);
+    pulsar(cliente);
+    await dormir(800);
+    if (!cliente.isConnected) return { ok: true, traza };
+
+    // 4. Unidad (se desbloquea al pulsar el cliente): la que se llame como el cliente o, si no, la primera.
+    const nombreCliente = norm(cliente.innerText || cliente.textContent).replace(/\s*(\.\.\.|…)$/, "");
+    const colUnidades = () => columna(/^unidades\b/);
+    const unidades = await esperarHasta(() => {
+      const u = colUnidades();
+      if (!u) return null;
+      const lista = u.items();
+      // Se espera a que la columna muestre las unidades de este cliente.
+      return lista.length && textoDe(u.h).includes(nombreCliente.slice(0, 12)) ? lista : null;
+    }, 5000) || (colUnidades() ? colUnidades().items() : []);
+    let ultimo = cliente;
+    if (unidades.length) {
+      const unidad = buscarEn(unidades, textos) || unidades[0];
+      traza.push(`pulso la unidad "${corto(unidad)}" (${unidades.length} disponible/s)`);
+      pulsar(unidad);
+      ultimo = unidad;
+      await dormir(1200);
+    } else traza.push("no veo unidades");
+
+    // 5. Si el panel sigue abierto, se entra con el icono ↗ de la unidad o del cliente.
+    if (ultimo.isConnected && visible(ultimo) && colClientes()) {
+      const entro = pulsarIcono(ultimo) || (cliente.isConnected && pulsarIcono(cliente));
+      traza.push(entro ? "pulso el icono ↗ para entrar" : "el panel sigue abierto y no veo icono ↗");
+    }
+    return { ok: true, traza };
   }
 
   if (accion === "clic") {
