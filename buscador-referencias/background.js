@@ -4,16 +4,17 @@ const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
 chrome.runtime.onMessage.addListener((msg, _sender, responder) => {
   if (msg && msg.tipo === "abrir") {
-    abrirTodas(msg.items).catch((e) => console.error(e));
+    abrirTodas(msg.items, msg.sinCliente || []).catch((e) => console.error(e));
     responder({ ok: true });
   }
 });
 
-async function abrirTodas(items) {
+async function abrirTodas(items, sinCliente) {
   const config = await cargarConfig();
   const registro = [];
-  const guardarRegistro = () =>
-    chrome.storage.local.set({ registro: { fecha: Date.now(), entradas: registro } });
+  const guardarRegistro = (enCurso = true) =>
+    chrome.storage.local.set({ registro: { fecha: Date.now(), enCurso, entradas: registro } });
+  await guardarRegistro();
 
   chrome.action.setBadgeBackgroundColor({ color: "#1a73e8" });
   const pendientes = [];
@@ -25,7 +26,7 @@ async function abrirTodas(items) {
     const tarea = abrirUna(config, cliente, ref)
       .then(() => registro.push({ ref, cliente: cliente.nombre, ok: true }))
       .catch((e) => registro.push({ ref, cliente: cliente.nombre, ok: false, error: e.message }))
-      .then(guardarRegistro);
+      .then(() => guardarRegistro());
 
     // En modo formulario y en secuencia, se espera a que termine cada búsqueda antes de la siguiente
     // (algunos portales guardan el cliente seleccionado en la sesión).
@@ -36,6 +37,13 @@ async function abrirTodas(items) {
   }
 
   await Promise.all(pendientes);
+
+  // Al terminar se añaden las referencias a las que no se pudo asignar cliente.
+  for (const ref of sinCliente) {
+    registro.push({ ref, cliente: "", ok: false, error: "no se ha encontrado su cliente" });
+  }
+  await guardarRegistro(false);
+
   const errores = registro.filter((r) => !r.ok).length;
   chrome.action.setBadgeBackgroundColor({ color: errores ? "#d93025" : "#188038" });
   chrome.action.setBadgeText({ text: errores ? "!" : "" });

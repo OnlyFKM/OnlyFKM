@@ -83,13 +83,24 @@ async function abrir() {
     return;
   }
 
-  await chrome.runtime.sendMessage({ tipo: "abrir", items: validas });
-  window.close();
+  // Las referencias sin cliente no frenan al resto: se abren las demás y las fallidas
+  // quedan en el registro (con el aviso "!") y en el cuadro de texto para corregirlas.
+  const sinCliente = items.filter((i) => !i.cliente).map((i) => i.ref);
+  await chrome.runtime.sendMessage({ tipo: "abrir", items: validas, sinCliente });
+  if (!sinCliente.length) return window.close();
+
+  $("texto").value = sinCliente.join("\n");
+  chrome.storage.local.set({ borrador: $("texto").value });
+  analizar();
 }
 
 async function mostrarRegistro() {
   const { registro } = await chrome.storage.local.get("registro");
   if (!registro || !registro.entradas.length) return;
+  if (registro.enCurso) {
+    $("registro").innerHTML = '<span class="suave">Abriendo búsquedas…</span>';
+    return;
+  }
   const errores = registro.entradas.filter((e) => !e.ok);
   const div = $("registro");
   if (!errores.length) {
@@ -100,10 +111,15 @@ async function mostrarRegistro() {
   for (const e of errores) {
     const linea = document.createElement("div");
     linea.className = "aviso";
-    linea.textContent = `• ${e.cliente} / ${e.ref}: ${e.error}`;
+    linea.textContent = e.cliente ? `• ${e.cliente} / ${e.ref}: ${e.error}` : `• ${e.ref}: ${e.error}`;
     div.append(linea);
   }
   chrome.action.setBadgeText({ text: "" });
 }
+
+// El registro se actualiza mientras se abren las pestañas: se repinta si el popup sigue abierto.
+chrome.storage.onChanged.addListener((cambios, area) => {
+  if (area === "local" && cambios.registro) mostrarRegistro();
+});
 
 iniciar();

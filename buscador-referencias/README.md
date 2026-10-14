@@ -74,9 +74,11 @@ Pérez Llorca: 777
 ```
 
 Antes de abrir verás la lista de referencias detectadas. Puedes cambiar el cliente de cualquiera o quitarla.
-Las que no tengan cliente salen en rojo y no se abren.
+Las que no tengan cliente salen en rojo. Al pulsar **Abrir** se abren todas las demás y, al terminar,
+el popup muestra un error con las referencias a las que no se les encontró cliente. Además, esas referencias se quedan en el
+cuadro de texto para que las corrijas (por ejemplo `CLIENTE; REFERENCIA`) y las vuelvas a lanzar.
 
-Si alguna búsqueda falla, el icono muestra un `!` y el popup indica qué referencia falló y por qué.
+Si alguna búsqueda falla en el portal, el icono muestra un `!` y el popup indica qué referencia falló y por qué.
 
 ## Pasar la configuración de Chrome a Edge
 
