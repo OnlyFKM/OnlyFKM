@@ -30,19 +30,32 @@ https://portal.com/expedientes?cliente={cliente}&ref={ref}
 
 Es el modo más rápido y fiable.
 
-**Opción B: rellenar el formulario.** Si la URL no cambia, la extensión abre la página de búsqueda,
-elige el cliente en el desplegable, escribe la referencia y pulsa Buscar. Necesita:
+**Opción B: seguir unos pasos en el portal** (la que viene configurada). Para cada referencia la extensión abre el portal
+y repite lo que harías a mano. Pasos por defecto:
 
-| Campo | Cómo obtenerlo |
-|---|---|
-| URL de la página de búsqueda | La dirección donde está el desplegable |
-| Selector del desplegable | Clic derecho sobre el desplegable → *Inspeccionar*. Si es `<select id="cliente">` → `#cliente`; si es `<select name="idCliente">` → `select[name="idCliente"]` |
-| Selector de las opciones | Solo si el desplegable no es un `<select>` (por ejemplo, una lista que se despliega al pulsar). Ej.: `.dropdown-menu li` |
-| Selector del cuadro de referencia | Igual, sobre el cuadro de texto. Ej.: `#referencia` |
-| Selector del botón Buscar | Opcional. Si lo dejas vacío se envía el formulario / se pulsa Intro |
+| # | Acción | Texto | Qué hace |
+|---|---|---|---|
+| 1 | seleccionar | `{cliente}` | Elige el cliente en el desplegable |
+| 2 | clic | `{modo}` | Activa el modo según el tipo de referencia (`D` → *Digital Risk Protection*) |
+| 3 | clic | `Amenazas` | Abre el apartado Amenazas |
+| 4 | clic | `Listado de amenazas` | Entra en el listado |
+| 5 | escribir | `{ref}` | Escribe la referencia en el cuadro de búsqueda |
+| 6 | enviar | | Pulsa Intro (o el botón del selector, si lo pones) |
 
-Si el portal recarga la página al cambiar de cliente, sube la *Espera tras elegir cliente*.
-Al guardar, el navegador te pedirá permiso para acceder al dominio del portal: es necesario para rellenar el formulario.
+Los clics se hacen **por el texto visible**, así que normalmente no hace falta ningún selector CSS. Solo hace falta uno si:
+
+- el desplegable de clientes no es un desplegable normal (por ejemplo, uno con buscador): pon su selector en el paso 1;
+- hay varios elementos con el mismo texto y pulsa el que no es: pon un selector en ese paso;
+- el cuadro de búsqueda no es el primero de la página: pon su selector en el paso 5.
+
+Para sacar un selector: clic derecho sobre el elemento → *Inspeccionar*. Si tiene `id="cliente"` el selector es `#cliente`.
+
+**Tipos de referencia:** la letra que va tras el código del cliente (`CAF-`**`D`**`-17317`) dice qué modo activar.
+Viene configurado `D` → *Digital Risk Protection*; puedes añadir más letras en Opciones. Si una referencia lleva una letra sin modo,
+no se abre y aparece en el error del popup. Las referencias sin letra (p. ej. `BANK; 12345`) usan el *tipo por defecto* (`D`).
+
+Si el portal tarda en cargar entre pasos, sube la *Espera entre pasos*.
+Al guardar, el navegador te pedirá permiso para acceder al dominio del portal: es necesario para hacer los pasos.
 
 ### 2. Clientes
 

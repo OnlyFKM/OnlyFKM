@@ -26,7 +26,7 @@
 
   <label>Cómo se hace la búsqueda en el portal</label>
   <div class="fila">
-    <label class="check"><input type="radio" name="modo" value="formulario"> Rellenando el formulario (desplegable de cliente + cuadro de referencia)</label>
+    <label class="check"><input type="radio" name="modo" value="formulario"> Siguiendo unos pasos en el portal (elegir cliente, entrar en el menú, buscar)</label>
   </div>
   <div class="fila">
     <label class="check"><input type="radio" name="modo" value="url"> Con una URL directa (si el portal pone el cliente y la referencia en la dirección)</label>
@@ -41,32 +41,42 @@
   </fieldset>
 
   <fieldset id="caja-formulario">
-    <legend>Formulario del portal</legend>
-    <label for="urlBusqueda">URL de la página de búsqueda</label>
-    <input id="urlBusqueda" placeholder="https://portal.com/busqueda">
+    <legend>Pasos en el portal</legend>
+    <label for="urlBusqueda">URL del portal (página donde empiezan los pasos)</label>
+    <input id="urlBusqueda" placeholder="https://portal.com/">
 
-    <label for="selectorCliente">Selector CSS del desplegable de cliente
-      <div class="ayuda">Clic derecho sobre el desplegable → Inspeccionar. Ej.: <code>select#cliente</code>, <code>select[name="idCliente"]</code></div>
+    <label>Pasos que se hacen para cada referencia, en orden
+      <div class="ayuda">
+        <b>seleccionar</b>: elige una opción en un desplegable (selector vacío = el desplegable que tenga esa opción).
+        <b>clic</b>: pulsa el elemento con ese texto visible. <b>escribir</b>: escribe en un cuadro (selector vacío = el primer cuadro de búsqueda).
+        <b>enviar</b>: pulsa el botón del selector o, si está vacío, pulsa Intro. <b>esperar</b>: espera los milisegundos del texto.<br>
+        En el texto puedes usar <code>{cliente}</code>, <code>{ref}</code>, <code>{modo}</code> (según el tipo de referencia) y <code>{tipo}</code>.
+        El selector CSS es opcional: úsalo solo si el texto no basta (clic derecho → Inspeccionar).
+      </div>
     </label>
-    <input id="selectorCliente">
+    <table>
+      <thead><tr><th>#</th><th>Acción</th><th>Texto</th><th>Selector CSS (opcional)</th><th></th></tr></thead>
+      <tbody id="pasos"></tbody>
+    </table>
+    <button id="anadirPaso">+ Añadir paso</button>
 
-    <label for="selectorOpcionCliente">Selector CSS de las opciones (solo si el desplegable NO es un &lt;select&gt;)
-      <div class="ayuda">Ej.: <code>.dropdown-menu li</code>. Vacío = <code>[role=option]</code></div>
+    <label>Tipos de referencia
+      <div class="ayuda">Letras que van tras el código del cliente (CAF-<b>D</b>-17317) y el modo del portal que hay que activar (<code>{modo}</code>).</div>
     </label>
-    <input id="selectorOpcionCliente">
-
-    <label for="selectorReferencia">Selector CSS del cuadro de referencia</label>
-    <input id="selectorReferencia">
-
-    <label for="selectorBoton">Selector CSS del botón Buscar
-      <div class="ayuda">Vacío = enviar el formulario / pulsar Intro</div>
-    </label>
-    <input id="selectorBoton">
+    <table>
+      <thead><tr><th>Letra</th><th>Modo en el portal</th><th></th></tr></thead>
+      <tbody id="tipos"></tbody>
+    </table>
+    <button id="anadirTipo">+ Añadir tipo</button>
 
     <div class="fila">
       <div>
-        <label for="esperaTrasClienteMs">Espera tras elegir cliente (ms)</label>
-        <input id="esperaTrasClienteMs" type="number" min="0" step="100">
+        <label for="tipoPorDefecto">Tipo si la referencia no lo lleva</label>
+        <input id="tipoPorDefecto">
+      </div>
+      <div>
+        <label for="esperaEntrePasosMs">Espera entre pasos (ms)</label>
+        <input id="esperaEntrePasosMs" type="number" min="0" step="100">
       </div>
       <div>
         <label for="timeoutMs">Tiempo máximo por paso (ms)</label>

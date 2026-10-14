@@ -2,21 +2,38 @@
 
 const CONFIG_POR_DEFECTO = {
   // "url": cada búsqueda es una URL directa construida con una plantilla.
-  // "formulario": se abre la página de búsqueda y se rellena el desplegable y el cuadro de búsqueda.
+  // "formulario": se abre el portal y se ejecuta la secuencia de pasos (elegir cliente, menús, buscar...).
   modo: "formulario",
 
   // Modo "url". Marcadores disponibles: {cliente} (valor del cliente), {nombre} y {ref}.
   urlPlantilla: "https://portal.ejemplo.com/buscar?cliente={cliente}&ref={ref}",
 
-  // Modo "formulario".
-  urlBusqueda: "https://portal.ejemplo.com/busqueda",
-  selectorCliente: "select#cliente",
-  selectorOpcionCliente: "", // solo si el desplegable no es un <select> nativo
-  selectorReferencia: "input#referencia",
-  selectorBoton: "", // vacío = enviar el formulario / pulsar Intro
-  esperaTrasClienteMs: 1500,
+  // Modo "formulario": página en la que empieza la secuencia de pasos.
+  urlBusqueda: "https://portal.ejemplo.com/",
+
+  // Pasos que se hacen en el portal para cada referencia, en orden. Acciones:
+  //   seleccionar: elige una opción en un desplegable (selector vacío = el <select> que tenga esa opción).
+  //   clic:        pulsa el elemento con ese texto visible (y/o que encaje con el selector).
+  //   escribir:    escribe el texto en un cuadro (selector vacío = el primer cuadro de búsqueda visible).
+  //   enviar:      pulsa el botón del selector o, si está vacío, envía el formulario / pulsa Intro.
+  //   esperar:     espera los milisegundos indicados en "texto".
+  // Marcadores en "texto": {cliente}, {ref}, {modo} (según el tipo de referencia) y {tipo}.
+  pasos: [
+    { accion: "seleccionar", selector: "", texto: "{cliente}" },
+    { accion: "clic", selector: "", texto: "{modo}" },
+    { accion: "clic", selector: "", texto: "Amenazas" },
+    { accion: "clic", selector: "", texto: "Listado de amenazas" },
+    { accion: "escribir", selector: "", texto: "{ref}" },
+    { accion: "enviar", selector: "", texto: "" }
+  ],
+  esperaEntrePasosMs: 1500,
   timeoutMs: 20000,
   enSecuencia: true,
+
+  // Tipo de referencia: las letras que siguen al código del cliente (CAF-D-17317 -> "D")
+  // indican en qué modo del portal hay que buscarla.
+  tipos: [{ letra: "D", modo: "Digital Risk Protection" }],
+  tipoPorDefecto: "D", // para referencias que no llevan tipo (p. ej. "BANK; 12345")
 
   retardoEntrePestanasMs: 400,
   activarPestanas: false,
@@ -151,6 +168,18 @@ function analizarTexto(texto, config) {
   return resultado;
 }
 
+// Devuelve el tipo de una referencia (las letras que siguen al código del cliente) y su modo en el portal.
+function tipoDeReferencia(ref, cliente, config) {
+  const r = String(ref).toUpperCase();
+  const codigo = String((cliente && cliente.codigo) || "").toUpperCase();
+  const i = codigo ? r.indexOf(codigo) : -1;
+  const resto = i >= 0 ? r.slice(i + codigo.length) : r;
+  const m = resto.match(/^[^A-Z0-9]*([A-Z]+)(?![A-Z])/);
+  const tipo = (m && i >= 0 ? m[1] : "") || String(config.tipoPorDefecto || "").toUpperCase();
+  const encontrado = (config.tipos || []).find((t) => String(t.letra).toUpperCase() === tipo);
+  return { tipo, modo: encontrado ? encontrado.modo : "" };
+}
+
 function construirUrl(plantilla, cliente, ref) {
   return plantilla
     .replace(/\{cliente\}/g, encodeURIComponent(cliente.valor || cliente.nombre))
@@ -169,5 +198,13 @@ function origenDe(url) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { CONFIG_POR_DEFECTO, analizarTexto, buscarClientePorCodigo, construirUrl, origenDe, normalizar };
+  module.exports = {
+    CONFIG_POR_DEFECTO,
+    analizarTexto,
+    buscarClientePorCodigo,
+    tipoDeReferencia,
+    construirUrl,
+    origenDe,
+    normalizar
+  };
 }

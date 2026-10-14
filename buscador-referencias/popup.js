@@ -57,7 +57,15 @@ function pintarLista() {
       pintarLista();
     });
 
-    fila.append(ref, sel, quitar);
+    const tipo = document.createElement("small");
+    if (item.cliente && config.modo === "formulario") {
+      const t = tipoDeReferencia(item.ref, item.cliente, config);
+      tipo.textContent = t.modo ? t.tipo : `${t.tipo || "?"} ✗`;
+      tipo.title = t.modo || "Tipo de referencia sin modo configurado: fallará";
+      tipo.className = t.modo ? "suave" : "aviso";
+    }
+
+    fila.append(ref, tipo, sel, quitar);
     lista.append(fila);
   }
 
