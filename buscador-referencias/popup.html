@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Buscar referencias</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    body { width: 420px; padding: 12px; }
+    #lista { max-height: 220px; overflow: auto; margin: 8px 0; border: 1px solid var(--borde); border-radius: 6px; }
+    #lista:empty { display: none; }
+    .item { display: flex; gap: 8px; align-items: center; padding: 4px 8px; border-bottom: 1px solid var(--borde); }
+    .item:last-child { border-bottom: 0; }
+    .item code { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .item select { width: 150px; padding: 2px 4px; }
+    .item.sin-cliente select { border-color: var(--aviso); }
+    .pie { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    #registro { margin-top: 8px; font-size: 12px; }
+    #registro:empty { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Buscar referencias</h1>
+  <textarea id="texto" rows="7" placeholder="Pega aquí las referencias, por ejemplo:
+Cliente A; A123456
+CB: B-778, B-779
+A654321"></textarea>
+  <div id="resumen" class="suave"></div>
+  <div id="lista"></div>
+  <div class="pie">
+    <a href="#" id="opciones">Configuración</a>
+    <button id="abrir" class="primario" disabled>Abrir pestañas</button>
+  </div>
+  <div id="registro"></div>
+  <script src="common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

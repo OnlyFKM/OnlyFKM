@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Buscador de referencias",
+  "version": "1.0.0",
+  "description": "Pega varias referencias de distintos clientes y ábrelas en el portal, una pestaña por referencia.",
+  "action": {
+    "default_title": "Buscar referencias",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "tabs", "scripting"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"]
+}

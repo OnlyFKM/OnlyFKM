@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Buscador de referencias · Configuración</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    body { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+    label { display: block; margin: 10px 0 4px; font-weight: 600; }
+    .ayuda { font-weight: normal; color: var(--suave); font-size: 12px; margin-top: 2px; }
+    fieldset { border: 1px solid var(--borde); border-radius: 8px; padding: 8px 16px 16px; margin: 12px 0; }
+    legend { font-weight: 600; padding: 0 6px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 12px; color: var(--suave); padding: 4px; }
+    td { padding: 3px 4px; }
+    td:last-child { width: 1%; }
+    .check { display: flex; gap: 8px; align-items: center; font-weight: normal; }
+    .check input { width: auto; }
+    .barra { position: sticky; bottom: 0; background: var(--fondo); padding: 12px 0; border-top: 1px solid var(--borde);
+      display: flex; gap: 8px; align-items: center; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>Configuración del buscador de referencias</h1>
+
+  <label>Cómo se hace la búsqueda en el portal</label>
+  <div class="fila">
+    <label class="check"><input type="radio" name="modo" value="formulario"> Rellenando el formulario (desplegable de cliente + cuadro de referencia)</label>
+  </div>
+  <div class="fila">
+    <label class="check"><input type="radio" name="modo" value="url"> Con una URL directa (si el portal pone el cliente y la referencia en la dirección)</label>
+  </div>
+
+  <fieldset id="caja-url">
+    <legend>URL directa</legend>
+    <label for="urlPlantilla">Plantilla de URL
+      <div class="ayuda">Usa {cliente} (valor del cliente), {nombre} y {ref}. Ej.: https://portal.com/buscar?cli={cliente}&amp;ref={ref}</div>
+    </label>
+    <input id="urlPlantilla">
+  </fieldset>
+
+  <fieldset id="caja-formulario">
+    <legend>Formulario del portal</legend>
+    <label for="urlBusqueda">URL de la página de búsqueda</label>
+    <input id="urlBusqueda" placeholder="https://portal.com/busqueda">
+
+    <label for="selectorCliente">Selector CSS del desplegable de cliente
+      <div class="ayuda">Clic derecho sobre el desplegable → Inspeccionar. Ej.: <code>select#cliente</code>, <code>select[name="idCliente"]</code></div>
+    </label>
+    <input id="selectorCliente">
+
+    <label for="selectorOpcionCliente">Selector CSS de las opciones (solo si el desplegable NO es un &lt;select&gt;)
+      <div class="ayuda">Ej.: <code>.dropdown-menu li</code>. Vacío = <code>[role=option]</code></div>
+    </label>
+    <input id="selectorOpcionCliente">
+
+    <label for="selectorReferencia">Selector CSS del cuadro de referencia</label>
+    <input id="selectorReferencia">
+
+    <label for="selectorBoton">Selector CSS del botón Buscar
+      <div class="ayuda">Vacío = enviar el formulario / pulsar Intro</div>
+    </label>
+    <input id="selectorBoton">
+
+    <div class="fila">
+      <div>
+        <label for="esperaTrasClienteMs">Espera tras elegir cliente (ms)</label>
+        <input id="esperaTrasClienteMs" type="number" min="0" step="100">
+      </div>
+      <div>
+        <label for="timeoutMs">Tiempo máximo por paso (ms)</label>
+        <input id="timeoutMs" type="number" min="1000" step="1000">
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="enSecuencia"> Procesar las referencias una a una (recomendado si el portal recuerda el cliente en la sesión)</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Clientes</legend>
+    <div class="ayuda">
+      <b>Nombre</b>: como lo escribes al pegar. <b>Valor en desplegable</b>: el <code>value</code> de la opción o su texto exacto.
+      <b>Alias</b>: otros nombres separados por comas. <b>Patrón</b>: expresión regular para detectar el cliente solo con la referencia (ej. <code>^A\d{6}$</code>).
+    </div>
+    <table>
+      <thead><tr><th>Nombre</th><th>Valor en desplegable</th><th>Alias</th><th>Patrón de referencia</th><th></th></tr></thead>
+      <tbody id="clientes"></tbody>
+    </table>
+    <button id="anadirCliente">+ Añadir cliente</button>
+
+    <label for="clientePorDefecto">Cliente por defecto (para referencias sin cliente reconocido)</label>
+    <select id="clientePorDefecto"></select>
+  </fieldset>
+
+  <fieldset>
+    <legend>Pestañas</legend>
+    <div class="fila">
+      <div>
+        <label for="retardoEntrePestanasMs">Retardo entre pestañas (ms)</label>
+        <input id="retardoEntrePestanasMs" type="number" min="0" step="100">
+      </div>
+      <div>
+        <label class="check" style="margin-top:32px"><input type="checkbox" id="activarPestanas"> Ir a cada pestaña al abrirla</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Importar / exportar</legend>
+    <div class="ayuda">Copia este JSON para pasar la configuración a otro navegador (p. ej. de Chrome a Edge).</div>
+    <textarea id="json" rows="6"></textarea>
+    <div class="fila" style="margin-top:8px">
+      <button id="exportar">Exportar</button>
+      <button id="importar">Importar</button>
+    </div>
+  </fieldset>
+
+  <div class="barra">
+    <button id="guardar" class="primario">Guardar</button>
+    <span id="estado"></span>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
