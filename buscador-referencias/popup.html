@@ -20,10 +20,11 @@
 </head>
 <body>
   <h1>Buscar referencias</h1>
-  <textarea id="texto" rows="7" placeholder="Pega aquí las referencias, por ejemplo:
-Cliente A; A123456
-CB: B-778, B-779
-A654321"></textarea>
+  <textarea id="texto" rows="7" placeholder="Pega aquí las referencias (una por línea o separadas por espacios).
+El cliente se detecta por su código dentro de la referencia, por ejemplo:
+ABAI-12345
+SERGAS 2024/001
+Si no se detecta, puedes escribir CLIENTE; REFERENCIA"></textarea>
   <div id="resumen" class="suave"></div>
   <div id="lista"></div>
   <div class="pie">
@@ -31,6 +32,7 @@ A654321"></textarea>
     <button id="abrir" class="primario" disabled>Abrir pestañas</button>
   </div>
   <div id="registro"></div>
+  <script src="clientes.js"></script>
   <script src="common.js"></script>
   <script src="popup.js"></script>
 </body>

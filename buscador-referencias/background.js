@@ -1,4 +1,4 @@
-importScripts("common.js");
+importScripts("clientes.js", "common.js");
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 

@@ -46,28 +46,35 @@ Al guardar, el navegador te pedirá permiso para acceder al dominio del portal: 
 
 ### 2. Clientes
 
+La extensión ya trae cargados los **168 clientes** de `referencias.xlsx` con su código (`ABAI`, `SERGAS`, `TEFCORP`…),
+que está en `clientes.js`. En Opciones puedes filtrarlos, editarlos o añadir más.
+
 | Columna | Para qué sirve |
 |---|---|
-| Nombre | Como lo escribirás al pegar las referencias |
-| Valor en desplegable | El `value` de la opción del desplegable o su texto exacto (en modo URL, lo que va en `{cliente}`) |
+| Nombre | Como aparece en el desplegable del portal |
+| Código en referencia | La parte de la referencia que indica el cliente |
+| Valor en desplegable | Solo si la opción del desplegable no se llama igual que el nombre |
 | Alias | Otras formas de escribir el cliente, separadas por comas |
-| Patrón | Expresión regular opcional para reconocer el cliente solo por la referencia. Ej.: `^A\d{6}$` = "A" + 6 cifras |
+| Patrón | Expresión regular opcional para casos especiales |
+
+**Cómo se detecta el cliente:** se busca el código dentro de la referencia sin que vaya pegado a otras letras
+(`TE-2024-1` → Telefonica España, `TEFCORP-2024-1` → Telefonica Corporativo, `INC-SERGAS-778` → SERGAS).
+Si encajan varios códigos gana el más largo. Si no encaja ninguno así, se prueba con el código al principio de la referencia
+(`sergas20240001` → SERGAS).
 
 ## Uso
 
-Pulsa el icono, pega las referencias y pulsa **Abrir N pestañas**. Puedes mezclar formatos:
+Pulsa el icono, pega las referencias (una por línea o separadas por espacios o comas) y pulsa **Abrir N pestañas**:
 
 ```
-Cliente A; A123456          ← cliente y referencia en la misma línea (; : | = o tabulador)
-CB: B-778, B-779            ← varias referencias del mismo cliente (usando un alias)
-Cliente C                   ← línea con solo el cliente: las siguientes son de ese cliente
-X-001
-X-002
-A654321                     ← suelta: se detecta el cliente por su patrón
+ABAI-12345 TEFCORP-2024-002
+INC-SERGAS-778
+BANK; 12345          ← si la referencia no lleva el código, escribe CLIENTE; REFERENCIA (vale el nombre o el código)
+Pérez Llorca: 777
 ```
 
 Antes de abrir verás la lista de referencias detectadas. Puedes cambiar el cliente de cualquiera o quitarla.
-Las que no tengan cliente salen en rojo y no se abren. También se pueden pegar dos columnas copiadas de Excel (cliente | referencia).
+Las que no tengan cliente salen en rojo y no se abren.
 
 Si alguna búsqueda falla, el icono muestra un `!` y el popup indica qué referencia falló y por qué.
 

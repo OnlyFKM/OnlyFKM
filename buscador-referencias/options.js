@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const CAMPOS_TEXTO = ["urlPlantilla", "urlBusqueda", "selectorCliente", "selectorOpcionCliente", "selectorReferencia", "selectorBoton"];
 const CAMPOS_NUMERO = ["esperaTrasClienteMs", "timeoutMs", "retardoEntrePestanasMs"];
 const CAMPOS_CHECK = ["enSecuencia", "activarPestanas"];
-const COLUMNAS = ["nombre", "valor", "alias", "patron"];
+const COLUMNAS = ["nombre", "codigo", "valor", "alias", "patron"];
 
 function pintar(config) {
   document.querySelectorAll('input[name="modo"]').forEach((r) => (r.checked = r.value === config.modo));
@@ -112,7 +112,18 @@ async function guardar() {
 }
 
 document.querySelectorAll('input[name="modo"]').forEach((r) => r.addEventListener("change", actualizarModo));
-$("anadirCliente").addEventListener("click", () => anadirFila());
+$("anadirCliente").addEventListener("click", () => {
+  $("filtro").value = "";
+  filtrar();
+  anadirFila();
+});
+$("filtro").addEventListener("input", filtrar);
+function filtrar() {
+  const t = normalizar($("filtro").value);
+  for (const tr of $("clientes").rows) {
+    tr.hidden = !!t && ![...tr.querySelectorAll("input")].some((i) => normalizar(i.value).includes(t));
+  }
+}
 $("guardar").addEventListener("click", guardar);
 $("exportar").addEventListener("click", () => {
   $("json").value = JSON.stringify(leer(), null, 2);

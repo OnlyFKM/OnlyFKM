@@ -22,21 +22,19 @@ const CONFIG_POR_DEFECTO = {
   activarPestanas: false,
   clientePorDefecto: "",
 
-  // Cada cliente: nombre visible, valor en el desplegable, alias (separados por comas)
-  // y un patrón (expresión regular) opcional para reconocer sus referencias.
-  clientes: [
-    { nombre: "Cliente A", valor: "A", alias: "CA", patron: "^A\\d{6}$" },
-    { nombre: "Cliente B", valor: "B", alias: "CB", patron: "^B-\\d+$" }
-  ]
+  // Cada cliente: nombre visible, valor en el desplegable (vacío = el nombre), alias (separados por comas),
+  // código que aparece dentro de sus referencias y un patrón (expresión regular) opcional.
+  clientes: typeof CLIENTES_INICIALES !== "undefined" ? CLIENTES_INICIALES : require("./clientes.js").CLIENTES_INICIALES
 };
 
 async function cargarConfig() {
-  const { config } = await chrome.storage.sync.get("config");
+  // Se usa storage.local: storage.sync limita cada elemento a 8 KB y la lista de clientes no cabe.
+  const { config } = await chrome.storage.local.get("config");
   return { ...CONFIG_POR_DEFECTO, ...(config || {}) };
 }
 
 async function guardarConfig(config) {
-  await chrome.storage.sync.set({ config });
+  await chrome.storage.local.set({ config });
 }
 
 function normalizar(texto) {
@@ -53,10 +51,35 @@ function buscarClientePorTexto(texto, clientes) {
   if (!t) return null;
   return (
     clientes.find((c) => {
-      const nombres = [c.nombre, c.valor, ...String(c.alias || "").split(",")];
+      const nombres = [c.nombre, c.valor, c.codigo, ...String(c.alias || "").split(",")];
       return nombres.some((n) => normalizar(n) && normalizar(n) === t);
     }) || null
   );
+}
+
+// Busca el cliente cuyo código aparece dentro de la referencia.
+// El código no puede ir pegado a otras letras (así "TE-123" no se confunde con "TEFCORP-123");
+// si varios encajan gana el más largo. Si ninguno, se prueba con el código al principio de la referencia.
+function buscarClientePorCodigo(ref, clientes) {
+  const r = String(ref).toUpperCase();
+  let mejor = null;
+  let mejorAlInicio = null;
+  for (const c of clientes) {
+    const codigo = String(c.codigo || "").trim().toUpperCase();
+    if (!codigo) continue;
+    let i = r.indexOf(codigo);
+    while (i !== -1) {
+      const antes = r[i - 1] || "";
+      const despues = r[i + codigo.length] || "";
+      if (!/[A-Z]/.test(antes) && !/[A-Z]/.test(despues)) {
+        if (!mejor || codigo.length > mejor.codigo.length) mejor = c;
+        break;
+      }
+      i = r.indexOf(codigo, i + 1);
+    }
+    if (r.startsWith(codigo) && (!mejorAlInicio || codigo.length > mejorAlInicio.codigo.length)) mejorAlInicio = c;
+  }
+  return mejor || mejorAlInicio;
 }
 
 // Busca el cliente cuyo patrón encaja con la referencia.
@@ -83,7 +106,8 @@ function separarReferencias(texto) {
 // Formatos admitidos (se pueden mezclar):
 //   CLIENTE;REF   CLIENTE:REF   CLIENTE|REF   CLIENTE<tab>REF   CLIENTE = REF1, REF2
 //   Una línea con solo el nombre del cliente -> las referencias siguientes son de ese cliente.
-//   REF suelta -> se detecta el cliente por patrón, si no por el último encabezado, si no el cliente por defecto.
+//   REF suelta -> se detecta el cliente por el código que contiene, si no por patrón,
+//                 si no por el último encabezado, si no el cliente por defecto.
 function analizarTexto(texto, config) {
   const clientes = config.clientes || [];
   const porDefecto = buscarClientePorTexto(config.clientePorDefecto, clientes);
@@ -118,7 +142,10 @@ function analizarTexto(texto, config) {
     }
 
     for (const ref of separarReferencias(linea)) {
-      anadir(ref, buscarClientePorPatron(ref, clientes) || clienteActual || porDefecto);
+      anadir(
+        ref,
+        buscarClientePorCodigo(ref, clientes) || buscarClientePorPatron(ref, clientes) || clienteActual || porDefecto
+      );
     }
   }
   return resultado;
@@ -142,5 +169,5 @@ function origenDe(url) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { CONFIG_POR_DEFECTO, analizarTexto, construirUrl, origenDe, normalizar };
+  module.exports = { CONFIG_POR_DEFECTO, analizarTexto, buscarClientePorCodigo, construirUrl, origenDe, normalizar };
 }

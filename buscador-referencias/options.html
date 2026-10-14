@@ -78,12 +78,14 @@
 
   <fieldset>
     <legend>Clientes</legend>
+    <input id="filtro" placeholder="Filtrar clientes…" style="margin-bottom:8px">
     <div class="ayuda">
-      <b>Nombre</b>: como lo escribes al pegar. <b>Valor en desplegable</b>: el <code>value</code> de la opción o su texto exacto.
-      <b>Alias</b>: otros nombres separados por comas. <b>Patrón</b>: expresión regular para detectar el cliente solo con la referencia (ej. <code>^A\d{6}$</code>).
+      <b>Nombre</b>: como aparece en el desplegable del portal. <b>Código en referencia</b>: la parte de la referencia que indica el cliente (ej. <code>ABAI</code>).
+      <b>Valor en desplegable</b>: solo si la opción del desplegable no se llama igual que el nombre.
+      <b>Alias</b>: otros nombres separados por comas. <b>Patrón</b>: expresión regular para casos especiales (ej. <code>^A\d{6}$</code>).
     </div>
     <table>
-      <thead><tr><th>Nombre</th><th>Valor en desplegable</th><th>Alias</th><th>Patrón de referencia</th><th></th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Código en referencia</th><th>Valor en desplegable</th><th>Alias</th><th>Patrón (opcional)</th><th></th></tr></thead>
       <tbody id="clientes"></tbody>
     </table>
     <button id="anadirCliente">+ Añadir cliente</button>
@@ -120,6 +122,7 @@
     <span id="estado"></span>
   </div>
 
+  <script src="clientes.js"></script>
   <script src="common.js"></script>
   <script src="options.js"></script>
 </body>
