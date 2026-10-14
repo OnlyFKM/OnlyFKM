@@ -156,7 +156,7 @@ function leer() {
 function validar(config) {
   const errores = [];
   const url = config.modo === "url" ? config.urlPlantilla : config.urlBusqueda;
-  if (!origenDe(url)) errores.push("La URL del portal no es válida.");
+  if ((config.modo === "url" || url) && !origenDe(url)) errores.push("La URL del portal no es válida.");
   if (config.modo === "url" && !config.urlPlantilla.includes("{ref}")) errores.push("La plantilla debe incluir {ref}.");
   if (config.modo === "formulario" && !config.pasos.length) errores.push("Añade al menos un paso.");
   for (const c of config.clientes) {
@@ -181,7 +181,7 @@ async function guardar() {
   if (errores.length) return estado(errores.join(" "), "aviso");
 
   // En modo formulario hace falta permiso para rellenar las páginas del portal.
-  if (config.modo === "formulario") {
+  if (config.modo === "formulario" && config.urlBusqueda) {
     const concedido = await chrome.permissions.request({ origins: [origenDe(config.urlBusqueda)] });
     if (!concedido) return estado("Guardado cancelado: hay que permitir el acceso al portal.", "aviso");
   }

@@ -9,7 +9,8 @@ const CONFIG_POR_DEFECTO = {
   urlPlantilla: "https://portal.ejemplo.com/buscar?cliente={cliente}&ref={ref}",
 
   // Modo "formulario": página en la que empieza la secuencia de pasos.
-  urlBusqueda: "https://portal.ejemplo.com/",
+  // Vacío = la pestaña en la que tengas abierto el portal al pulsar el icono.
+  urlBusqueda: "",
 
   // Pasos que se hacen en el portal para cada referencia, en orden. Acciones:
   //   seleccionar: elige una opción en un desplegable (selector vacío = el <select> que tenga esa opción).
@@ -47,7 +48,10 @@ const CONFIG_POR_DEFECTO = {
 async function cargarConfig() {
   // Se usa storage.local: storage.sync limita cada elemento a 8 KB y la lista de clientes no cabe.
   const { config } = await chrome.storage.local.get("config");
-  return { ...CONFIG_POR_DEFECTO, ...(config || {}) };
+  const resultado = { ...CONFIG_POR_DEFECTO, ...(config || {}) };
+  // La URL de ejemplo de versiones anteriores equivale a no tener URL.
+  if (/portal\.ejemplo\.com/.test(resultado.urlBusqueda)) resultado.urlBusqueda = "";
+  return resultado;
 }
 
 async function guardarConfig(config) {

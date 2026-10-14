@@ -55,7 +55,12 @@ Viene configurado `D` → *Digital Risk Protection*; puedes añadir más letras 
 no se abre y aparece en el error del popup. Las referencias sin letra (p. ej. `BANK; 12345`) usan el *tipo por defecto* (`D`).
 
 Si el portal tarda en cargar entre pasos, sube la *Espera entre pasos*.
-Al guardar, el navegador te pedirá permiso para acceder al dominio del portal: es necesario para hacer los pasos.
+
+**URL del portal:** no hace falta ponerla. Si la dejas vacía, entra en el portal como siempre y pulsa el icono
+de la extensión **desde la pestaña del portal**: los pasos empiezan en esa página. La primera vez el popup mostrará
+*Permitir acceso*; púlsalo y acepta (la extensión necesita ese permiso para hacer los pasos en el portal). Si el navegador
+cierra el popup al aceptar, vuelve a abrirlo: el permiso ya queda guardado.
+Si prefieres que funcione desde cualquier pestaña, pon la URL en Opciones.
 
 ### 2. Clientes
 
@@ -77,7 +82,7 @@ Si encajan varios códigos gana el más largo. Si no encaja ninguno así, se pru
 
 ## Uso
 
-Pulsa el icono, pega las referencias (una por línea o separadas por espacios o comas) y pulsa **Abrir N pestañas**:
+Con el portal abierto en la pestaña actual, pulsa el icono, pega las referencias (una por línea o separadas por espacios o comas) y pulsa **Abrir N pestañas**:
 
 ```
 ABAI-12345 TEFCORP-2024-002

@@ -1,11 +1,14 @@
 const $ = (id) => document.getElementById(id);
 let config;
 let items = [];
+// Página del portal donde empiezan los pasos y si hay permiso para usarla.
+let portal = { url: "", permitido: false };
 
 async function iniciar() {
   config = await cargarConfig();
   const { borrador = "" } = await chrome.storage.local.get("borrador");
   $("texto").value = borrador;
+  await comprobarPortal();
   analizar();
   mostrarRegistro();
 
@@ -21,6 +24,46 @@ async function iniciar() {
 
   if (!config.clientes.length) {
     $("resumen").innerHTML = '<span class="aviso">No hay clientes configurados. Ve a Configuración.</span>';
+  }
+}
+
+// Sin URL configurada se usa la pestaña actual: basta con abrir el popup estando dentro del portal.
+async function comprobarPortal() {
+  const div = $("portal");
+  div.textContent = "";
+  if (config.modo !== "formulario") return;
+
+  let url = config.urlBusqueda;
+  if (!url) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    url = tab && /^https?:/.test(tab.url || "") ? tab.url : "";
+  }
+  const origen = url ? origenDe(url) : null;
+  if (!origen) {
+    portal = { url: "", permitido: false };
+    div.innerHTML = '<span class="aviso">Abre el portal en esta pestaña y vuelve a pulsar el icono.</span>';
+    return;
+  }
+
+  const permitido = await chrome.permissions.contains({ origins: [origen] });
+  portal = { url, permitido };
+  const host = new URL(url).host;
+  div.append(`Portal: ${host}${config.urlBusqueda ? "" : " (pestaña actual)"}`);
+  if (!permitido) {
+    const boton = document.createElement("button");
+    boton.textContent = "Permitir acceso";
+    boton.title = "La extensión necesita permiso para hacer los pasos en este portal";
+    // Si el navegador cierra el popup al mostrar el aviso, el permiso queda igualmente concedido.
+    boton.addEventListener("click", async () => {
+      if (await chrome.permissions.request({ origins: [origen] })) {
+        await comprobarPortal();
+        pintarLista();
+      }
+    });
+    div.append(boton);
+    div.className = "aviso";
+  } else {
+    div.className = "suave";
   }
 }
 
@@ -75,7 +118,7 @@ function pintarLista() {
     ? `${items.length} referencia(s) detectada(s)` + (sinCliente ? ` · ${sinCliente} sin cliente` : "")
     : "";
   $("resumen").className = sinCliente ? "aviso" : "suave";
-  $("abrir").disabled = validas === 0;
+  $("abrir").disabled = validas === 0 || (config.modo === "formulario" && !portal.permitido);
   $("abrir").textContent = validas ? `Abrir ${validas} pestaña(s)` : "Abrir pestañas";
 }
 
@@ -83,18 +126,11 @@ async function abrir() {
   const validas = items.filter((i) => i.cliente);
   if (!validas.length) return;
 
-  // Permiso sobre el dominio del portal (se concede al guardar la configuración).
-  const origen = origenDe(config.urlBusqueda);
-  if (config.modo === "formulario" && !(origen && (await chrome.permissions.contains({ origins: [origen] })))) {
-    $("resumen").textContent = "Falta el permiso sobre el portal: abre Configuración y pulsa Guardar.";
-    $("resumen").className = "aviso";
-    return;
-  }
 
   // Las referencias sin cliente no frenan al resto: se abren las demás y las fallidas
   // quedan en el registro (con el aviso "!") y en el cuadro de texto para corregirlas.
   const sinCliente = items.filter((i) => !i.cliente).map((i) => i.ref);
-  await chrome.runtime.sendMessage({ tipo: "abrir", items: validas, sinCliente });
+  await chrome.runtime.sendMessage({ tipo: "abrir", items: validas, sinCliente, urlInicio: portal.url });
   if (!sinCliente.length) return window.close();
 
   $("texto").value = sinCliente.join("\n");

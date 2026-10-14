@@ -42,8 +42,11 @@
 
   <fieldset id="caja-formulario">
     <legend>Pasos en el portal</legend>
-    <label for="urlBusqueda">URL del portal (página donde empiezan los pasos)</label>
-    <input id="urlBusqueda" placeholder="https://portal.com/">
+    <label for="urlBusqueda">URL del portal (opcional)
+      <div class="ayuda">Déjala vacía para usar la extensión desde dentro del portal: los pasos empiezan en la página que tengas abierta al pulsar el icono.
+      Si la rellenas, se usará siempre esa página, estés donde estés.</div>
+    </label>
+    <input id="urlBusqueda" placeholder="Vacío = la pestaña actual">
 
     <label>Pasos que se hacen para cada referencia, en orden
       <div class="ayuda">

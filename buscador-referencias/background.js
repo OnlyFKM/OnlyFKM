@@ -4,13 +4,14 @@ const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
 chrome.runtime.onMessage.addListener((msg, _sender, responder) => {
   if (msg && msg.tipo === "abrir") {
-    abrirTodas(msg.items, msg.sinCliente || []).catch((e) => console.error(e));
+    abrirTodas(msg.items, msg.sinCliente || [], msg.urlInicio).catch((e) => console.error(e));
     responder({ ok: true });
   }
 });
 
-async function abrirTodas(items, sinCliente) {
+async function abrirTodas(items, sinCliente, urlInicio) {
   const config = await cargarConfig();
+  if (urlInicio) config.urlBusqueda = urlInicio;
   const registro = [];
   const guardarRegistro = (enCurso = true) =>
     chrome.storage.local.set({ registro: { fecha: Date.now(), enCurso, entradas: registro } });
