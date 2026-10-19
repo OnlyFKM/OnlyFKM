@@ -51,6 +51,9 @@ const CONFIG_POR_DEFECTO = {
   // OB que se pulsa en el panel antes de buscar el cliente (desbloquea la columna Clientes).
   obPanel: "Global",
   esperaEntrePasosMs: 1500,
+  // Abrir el resultado con un clic de ratón real (permiso de depuración; muestra un momento la barra
+  // "… ha empezado a depurar este navegador"). Desactivado: solo clic simulado.
+  clicReal: true,
   timeoutMs: 20000,
   enSecuencia: true,
 

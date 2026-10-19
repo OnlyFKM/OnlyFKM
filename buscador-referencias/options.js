@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const CAMPOS_TEXTO = ["urlPlantilla", "urlBusqueda", "tipoPorDefecto", "obPanel", "pantallaEnlace"];
 const CAMPOS_NUMERO = ["esperaEntrePasosMs", "timeoutMs", "retardoEntrePestanasMs"];
 const ACCIONES = ["panelCliente", "campo", "abrirResultado", "seleccionar", "clic", "escribir", "enviar", "esperar"];
-const CAMPOS_CHECK = ["enSecuencia", "activarPestanas"];
+const CAMPOS_CHECK = ["enSecuencia", "activarPestanas", "clicReal"];
 const COLUMNAS = ["nombre", "codigo", "enlace", "valor", "alias", "patron"];
 
 function pintar(config) {

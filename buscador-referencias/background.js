@@ -51,6 +51,7 @@ async function abrirTodas(items, sinCliente, urlInicio) {
   }
 
   await Promise.all(pendientes);
+  await soltarDepurador(); // por si alguna conexión del depurador quedó abierta
 
   // Al terminar se añaden las referencias a las que no se pudo asignar cliente.
   for (const ref of sinCliente) {
@@ -131,7 +132,7 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
       // Para abrir el resultado se prueba primero un clic de ratón real (algunas tablas no hacen caso
       // de los clics simulados); si no abre nada, se sigue con el clic simulado de siempre.
       let previo = [];
-      if (paso.accion === "abrirResultado") {
+      if (paso.accion === "abrirResultado" && config.clicReal !== false) {
         const real = await abrirConClicReal(tabId, textos, config, marcos, nuevas);
         if (real.abierto) {
           traza.push(`paso ${n + 1} ${paso.accion} ✓`);
@@ -212,12 +213,36 @@ async function abrirConClicReal(tabId, textos, config, marcos, nuevas) {
   return { abierto: false, traza };
 }
 
+// Pestañas a las que la extensión se ha conectado con el depurador (para desconectarlas siempre al terminar).
+const depuradas = new Set();
+chrome.debugger.onDetach.addListener((origen) => depuradas.delete(origen.tabId));
+
+// Ningún comando del depurador puede quedarse colgado (p. ej. si el clic hace navegar la página):
+// si tarda más de "ms", se da por fallido y se sigue, para poder desconectarse siempre.
+function conLimite(promesa, ms, que) {
+  return Promise.race([
+    promesa,
+    new Promise((_, rechazar) => setTimeout(() => rechazar(new Error(`${que}: sin respuesta`)), ms))
+  ]);
+}
+
+// Desconecta el depurador de una pestaña (o de todas a las que se haya conectado). Así la barra
+// "… ha empezado a depurar este navegador" se quita sola sin que haya que pulsar Cancelar.
+async function soltarDepurador(tabId) {
+  const pestanas = tabId == null ? [...depuradas] : [tabId];
+  for (const id of pestanas) {
+    await conLimite(chrome.debugger.detach({ tabId: id }), 3000, "desconectar").catch(() => {});
+    depuradas.delete(id);
+  }
+}
+
 // Clic (o doble clic) de ratón real en el elemento marcado con data-buscador-clic, esté en el marco que esté.
 async function clicReal(tabId, veces) {
   const destino = { tabId };
-  await chrome.debugger.attach(destino, "1.3");
+  await conLimite(chrome.debugger.attach(destino, "1.3"), 5000, "conectar el depurador");
+  depuradas.add(tabId);
   try {
-    const enviar = (metodo, params) => chrome.debugger.sendCommand(destino, metodo, params);
+    const enviar = (metodo, params) => conLimite(chrome.debugger.sendCommand(destino, metodo, params), 5000, metodo);
     await enviar("DOM.getDocument", { depth: -1, pierce: true });
     const { searchId, resultCount } = await enviar("DOM.performSearch", { query: "[data-buscador-clic]" });
     if (!resultCount) throw new Error("no encuentro el resultado marcado");
@@ -235,7 +260,7 @@ async function clicReal(tabId, veces) {
       await enviar("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: i });
     }
   } finally {
-    await chrome.debugger.detach(destino).catch(() => {});
+    await soltarDepurador(tabId);
   }
 }
 
@@ -271,13 +296,15 @@ async function ejecutarEnSuMarco(tabId, args, marcos) {
   const limite = Date.now() + timeoutMs;
   let candidatos = [];
   for (;;) {
-    const res = await chrome.scripting
-      .executeScript({
+    const res = await conLimite(
+      chrome.scripting.executeScript({
         target: { tabId, allFrames: true },
         func: pasoEnPagina,
         args: [accion, selector, textos, 0, { ...extra, sondear: true }]
-      })
-      .catch(() => []);
+      }),
+      10000,
+      "sondeo"
+    ).catch(() => []);
     candidatos = res.filter((r) => r.result && r.result.ok).map((r) => r.frameId);
     if (candidatos.length || Date.now() >= limite) break;
     await esperar(400);
@@ -322,7 +349,8 @@ async function describirMarcos(tabId) {
 async function ejecutar(tabId, func, args, frameId) {
   try {
     const target = frameId == null ? { tabId } : { tabId, frameIds: [frameId] };
-    const [res] = await chrome.scripting.executeScript({ target, func, args });
+    // Con límite: si la página se queda bloqueada (p. ej. un aviso emergente), no se espera para siempre.
+    const [res] = await conLimite(chrome.scripting.executeScript({ target, func, args }), (args[3] || 0) + 10000, "la página no responde");
     return res && res.result ? res.result : { ok: false, navegando: true, error: "la página cambió durante el paso" };
   } catch (e) {
     // Si la página navega mientras se ejecuta el paso, Chrome corta la ejecución.

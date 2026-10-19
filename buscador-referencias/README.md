@@ -36,8 +36,17 @@ de acceso al portal (`cybersecurity.telefonica.com`).
 
 El paso 4 hace un **clic de ratón real** en la fila (la tabla del portal no hace caso de los clics simulados por código).
 Para eso la extensión usa el permiso de depuración del navegador: mientras pulsa aparece un momento arriba la barra
-*"Buscador de referencias ha empezado a depurar este navegador"*, que se quita sola. Si el clic real no abre nada,
-prueba con doble clic y, al final, con un clic simulado.
+*"Buscador de referencias ha empezado a depurar este navegador"*. La extensión se desconecta del depurador justo
+después de cada clic (y, por si acaso, de todas las pestañas al terminar), así que la barra se quita sola a los pocos
+segundos: **no hay que pulsar *Cancelar***. Si el clic real no abre nada, prueba con doble clic y, al final, con un clic
+simulado. Se puede desactivar en Opciones (*Abrir el resultado con un clic de ratón real*), pero entonces el portal no
+abre la amenaza.
+
+**Para no ver nunca la barra:** abre Chrome o Edge con la opción `--silent-debugger-extension-api`. En Windows:
+cierra todas las ventanas del navegador, clic derecho en su acceso directo → *Propiedades* → en *Destino*, añade al
+final, tras las comillas, un espacio y `--silent-debugger-extension-api` (p. ej.
+`"C:\Program Files\Google\Chrome\Application\chrome.exe" --silent-debugger-extension-api`) → *Aceptar*, y abre
+el navegador desde ese acceso directo. Ten en cuenta que así tampoco verías el aviso si otra extensión usara el depurador.
 
 Si el panel de filtros ya estaba abierto y el paso 1 lo cierra, el paso 2 lo detecta y vuelve a pulsar *Filtros*.
 Cada pestaña acaba en la ficha de su amenaza. Si el portal abre la ficha en una pestaña nueva, la extensión se queda
