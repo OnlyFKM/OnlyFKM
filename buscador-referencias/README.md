@@ -34,6 +34,11 @@ de acceso al portal (`cybersecurity.telefonica.com`).
 | 3 | clic | `Buscar` | | Pulsa el *Buscar* del panel de filtros (si hay varios, el que está junto al campo) |
 | 4 | abrirResultado | `{ref}` | | Espera a los resultados y pulsa la celda de la columna *Referencia* que tiene **exactamente** esa referencia (`CAF-D-1731` no abre `CAF-D-17317`) para abrir la amenaza. Nunca pulsa otros enlaces de la fila, como el caso `CARR-D-213063-0001` de la columna *Casos*. Si con un clic no se abre, prueba con doble clic |
 
+El paso 4 hace un **clic de ratón real** en la fila (la tabla del portal no hace caso de los clics simulados por código).
+Para eso la extensión usa el permiso de depuración del navegador: mientras pulsa aparece un momento arriba la barra
+*"Buscador de referencias ha empezado a depurar este navegador"*, que se quita sola. Si el clic real no abre nada,
+prueba con doble clic y, al final, con un clic simulado.
+
 Si el panel de filtros ya estaba abierto y el paso 1 lo cierra, el paso 2 lo detecta y vuelve a pulsar *Filtros*.
 Cada pestaña acaba en la ficha de su amenaza. Si el portal abre la ficha en una pestaña nueva, la extensión se queda
 con esa y cierra la del listado. El clic del paso 4 se hace de una referencia en una para que cada ficha nueva

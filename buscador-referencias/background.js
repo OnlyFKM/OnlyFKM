@@ -128,7 +128,22 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
     const hacerPaso = async () => {
       if (abrePestanas) nuevas.length = 0; // solo cuentan las pestañas creadas durante este paso
+      // Para abrir el resultado se prueba primero un clic de ratón real (algunas tablas no hacen caso
+      // de los clics simulados); si no abre nada, se sigue con el clic simulado de siempre.
+      let previo = [];
+      if (paso.accion === "abrirResultado") {
+        const real = await abrirConClicReal(tabId, textos, config, marcos, nuevas);
+        if (real.abierto) {
+          traza.push(`paso ${n + 1} ${paso.accion} ✓`);
+          for (const t of real.traza) traza.push(`   · ${t}`);
+          await esperar(config.esperaEntrePasosMs);
+          await cambiarAPestanaNueva();
+          return;
+        }
+        previo = real.traza;
+      }
       let r = await ejecutarEnSuMarco(tabId, args, marcos);
+      r.traza = [...previo, ...(r.traza || [])];
       if (!r.ok && r.navegando && !navega) {
         // La página se estaba recargando: se espera a que termine y se repite el paso.
         await esperarCarga(tabId, config.timeoutMs);
@@ -144,6 +159,9 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
       // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
       await esperar(config.esperaEntrePasosMs);
+      await cambiarAPestanaNueva();
+    };
+    const cambiarAPestanaNueva = async () => {
       const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, abrePestanas);
       if (abierta) {
         const anterior = tabId;
@@ -169,6 +187,68 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
     await esperarCarga(tabId, config.timeoutMs);
   }
   return tabId;
+}
+
+// Abre el resultado con un clic de ratón real (protocolo de depuración del navegador): la página marca la celda
+// de la referencia, se pulsa en sus coordenadas y se comprueba si se ha abierto algo. Primero un clic y, si no,
+// doble clic. Devuelve { abierto, traza }.
+async function abrirConClicReal(tabId, textos, config, marcos, nuevas) {
+  const traza = [];
+  const marcado = await ejecutarEnSuMarco(tabId, ["abrirResultado", "", textos, config.timeoutMs, { modo: "marcar" }], marcos);
+  if (!marcado.ok) return { abierto: false, traza: [`no pude marcar el resultado: ${marcado.error}`] };
+  traza.push(...(marcado.traza || []));
+  const marco = marcos.ultimo;
+  for (const veces of [1, 2]) {
+    try {
+      await clicReal(tabId, veces);
+    } catch (e) {
+      traza.push(`no se pudo hacer el clic real (${e.message}): pruebo con clic simulado`);
+      return { abierto: false, traza };
+    }
+    traza.push(veces === 1 ? "clic real del ratón en la fila" : "no se abrió: doble clic real");
+    if (await seHaAbierto(tabId, marco, nuevas, 3000)) return { abierto: true, traza };
+  }
+  traza.push("con el clic real no se abre: pruebo con clic simulado");
+  return { abierto: false, traza };
+}
+
+// Clic (o doble clic) de ratón real en el elemento marcado con data-buscador-clic, esté en el marco que esté.
+async function clicReal(tabId, veces) {
+  const destino = { tabId };
+  await chrome.debugger.attach(destino, "1.3");
+  try {
+    const enviar = (metodo, params) => chrome.debugger.sendCommand(destino, metodo, params);
+    await enviar("DOM.getDocument", { depth: -1, pierce: true });
+    const { searchId, resultCount } = await enviar("DOM.performSearch", { query: "[data-buscador-clic]" });
+    if (!resultCount) throw new Error("no encuentro el resultado marcado");
+    const { nodeIds } = await enviar("DOM.getSearchResults", { searchId, fromIndex: 0, toIndex: resultCount });
+    await enviar("DOM.discardSearchResults", { searchId });
+    const nodeId = nodeIds[0];
+    await enviar("DOM.scrollIntoViewIfNeeded", { nodeId }).catch(() => {});
+    const { model } = await enviar("DOM.getBoxModel", { nodeId });
+    const q = model.border;
+    const x = (q[0] + q[2] + q[4] + q[6]) / 4;
+    const y = (q[1] + q[3] + q[5] + q[7]) / 4;
+    await enviar("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+    for (let i = 1; i <= veces; i++) {
+      await enviar("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", buttons: 1, clickCount: i });
+      await enviar("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: i });
+    }
+  } finally {
+    await chrome.debugger.detach(destino).catch(() => {});
+  }
+}
+
+// ¿Ha abierto algo el clic? Página o marco que navega, la fila que desaparece, una ventana encima o una pestaña nueva.
+async function seHaAbierto(tabId, marco, nuevas, ms) {
+  const limite = Date.now() + ms;
+  do {
+    if (nuevas.length) return true;
+    const r = await ejecutar(tabId, pasoEnPagina, ["abrirResultado", "", [""], 0, { modo: "comprobar" }], marco);
+    if ((!r.ok && r.navegando) || (r.ok && r.cambiado)) return true;
+    await esperar(300);
+  } while (Date.now() < limite);
+  return false;
 }
 
 // Pestaña abierta por la página durante un paso: la que indique esta pestaña como origen o, si "conCandado"
@@ -575,6 +655,16 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     return { ok: true, traza: [`pulso "${(el.innerText || el.value || el.textContent || "").trim().slice(0, 40)}" (${el.tagName.toLowerCase()})`] };
   }
 
+  if (accion === "abrirResultado" && extra.modo === "comprobar") {
+    // Tras el clic real: ¿ha cambiado algo respecto a cuando se marcó el resultado?
+    const antes = window.__buscadorAntes;
+    const marcado = document.querySelector("[data-buscador-clic]");
+    if (!antes || !marcado) return { ok: true, cambiado: true };
+    const fila = marcado.closest("tr,[role=row]") || marcado;
+    const ventanas = [...document.querySelectorAll(antes.selectorVentanas)].filter(visible).length;
+    return { ok: true, cambiado: location.href !== antes.url || !fila.isConnected || !visible(fila) || ventanas > antes.ventanas };
+  }
+
   if (accion === "abrirResultado") {
     // Pulsa, en la lista de resultados, el elemento que contiene exactamente la referencia
     // (sin confundir "CAF-D-1731" con "CAF-D-17317") para abrir su ficha.
@@ -618,6 +708,15 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
       }
       return haCambiado();
     };
+
+    if (extra.modo === "marcar") {
+      // Para el clic real: se marca la celda (lo pulsa el service worker) y se guarda cómo estaba la página.
+      document.querySelectorAll("[data-buscador-clic]").forEach((e) => e.removeAttribute("data-buscador-clic"));
+      destino.setAttribute("data-buscador-clic", "1");
+      const selectorVentanas = "[role=dialog],.modal,.cdk-overlay-pane,[class*=drawer],[class*=sidenav],[class*=detail]";
+      window.__buscadorAntes = { url: location.href, ventanas: ventanas(), selectorVentanas };
+      return { ok: true, traza: [`resultado encontrado: ${describir(destino)}`] };
+    }
 
     traza.push(`pulso ${describir(destino)}`);
     pulsar(destino);
