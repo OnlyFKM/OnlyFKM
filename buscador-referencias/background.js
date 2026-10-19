@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, responder) => {
 
 async function abrirTodas(items, sinCliente, urlInicio) {
   const config = await cargarConfig();
-  if (urlInicio) config.urlBusqueda = urlInicio;
+  if (urlInicio && config.modo === "formulario") config.urlBusqueda = urlInicio;
   const registro = [];
   const guardarRegistro = (enCurso = true) =>
     chrome.storage.local.set({ registro: { fecha: Date.now(), enCurso, entradas: registro } });
@@ -61,13 +61,21 @@ async function abrirUna(config, cliente, ref) {
   }
 
   const { tipo, modo } = tipoDeReferencia(ref, cliente, config);
-  const usaModo = config.pasos.some((p) => String(p.texto || "").includes("{modo}"));
+  const usaModo = pasosDe(config).some((p) => String(p.texto || "").includes("{modo}"));
   if (usaModo && !modo) {
     throw new Error(tipo ? `el tipo "${tipo}" no tiene modo configurado` : "no se reconoce el tipo de referencia");
   }
   const valores = { cliente: cliente.nombre, ref, modo, tipo };
 
-  const tab = await chrome.tabs.create({ url: config.urlBusqueda, active });
+  let inicio = config.urlBusqueda;
+  if (config.modo === "enlace") {
+    inicio = construirEnlace(cliente, config.pantallaEnlace);
+    if (!inicio) throw new Error("el cliente no tiene enlace directo (añádelo en Configuración → Clientes)");
+  }
+  // Para reconocer las pestañas que abra el portal durante los pasos.
+  config.origenPortal = origenDe(inicio);
+
+  const tab = await chrome.tabs.create({ url: inicio, active });
   propias.add(tab.id);
   let tabId = tab.id;
   await esperarCarga(tabId, config.timeoutMs);
@@ -90,7 +98,7 @@ const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente"];
 
 async function hacerPasos(config, cliente, valores, tabId, nuevas) {
   const traza = []; // lo que se ha hecho, para mostrarlo en el popup si algo falla
-  for (const [n, paso] of config.pasos.entries()) {
+  for (const [n, paso] of pasosDe(config).entries()) {
     if (paso.accion === "esperar") {
       await esperar(Number(paso.texto) || 1000);
       continue;
@@ -122,7 +130,7 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
     await esperar(config.esperaEntrePasosMs);
     // Pestaña abierta por la página durante el paso: la que indique esta pestaña como origen
     // o, si el navegador no lo indica bien, cualquier pestaña nueva del mismo portal.
-    const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, origenDe(config.urlBusqueda));
+    const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, config.origenPortal);
     if (abierta) {
       const anterior = tabId;
       tabId = abierta.id;
@@ -460,18 +468,29 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
           'input[type=search],input[type=text],input:not([type]),textarea'
         )
       ].filter((i) => visible(i) && !i.disabled && !i.readOnly);
-    const input = await esperarA(() => {
-      if (selector) {
+    const elegir = (lista) => lista.find((i) => /busc|search|filtr|refer|amenaza/i.test(i.placeholder + i.name + i.id)) || lista[0];
+    const fueraDeLaBarra = () => candidatos().filter((i) => i.getBoundingClientRect().top >= 90);
+    let input;
+    if (selector) {
+      input = await esperarA(() => {
         const el = document.querySelector(selector);
         return el && !el.disabled ? el : null;
+      });
+    } else {
+      // El buscador del listado puede tardar en cargar: se espera a que aparezca uno fuera de la barra
+      // superior antes de recurrir a los de la barra (p. ej. el buscador general de la plataforma).
+      const limite = Date.now() + Math.min(timeoutMs, 15000);
+      while (!input && Date.now() < limite) {
+        input = elegir(fueraDeLaBarra());
+        if (!input) await dormir(250);
       }
-      const lista = candidatos();
-      return lista.find((i) => /busc|search|filtr|refer|amenaza/i.test(i.placeholder + i.name + i.id)) || lista[0];
-    });
+      input = input || elegir(candidatos());
+    }
     if (!input) return { ok: false, error: `no se encontró el cuadro de búsqueda${selector ? ` (${selector})` : ""}` };
     escribirEn(input, textos[0]);
     input.setAttribute("data-buscador-referencias", "1");
-    return { ok: true };
+    const nombre = input.placeholder || input.name || input.id || input.tagName.toLowerCase();
+    return { ok: true, traza: [`escribo "${textos[0]}" en el cuadro "${nombre}"`] };
   }
 
   if (accion === "enviar") {

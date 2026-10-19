@@ -26,6 +26,9 @@
 
   <label>Cómo se hace la búsqueda en el portal</label>
   <div class="fila">
+    <label class="check"><input type="radio" name="modo" value="enlace"> Con el enlace directo de cada cliente (recomendado: abre el cliente y busca la referencia)</label>
+  </div>
+  <div class="fila">
     <label class="check"><input type="radio" name="modo" value="formulario"> Siguiendo unos pasos en el portal (elegir cliente, entrar en el menú, buscar)</label>
   </div>
   <div class="fila">
@@ -40,14 +43,28 @@
     <input id="urlPlantilla">
   </fieldset>
 
+  <fieldset id="caja-enlace">
+    <legend>Enlace directo</legend>
+    <label for="pantallaEnlace">Pantalla del cliente que se abre
+      <div class="ayuda">Se añade al enlace de cada cliente (columna <b>Enlace</b> de Clientes) como <code>?URL=…</code>.
+      <code>/threats/threats</code> = listado de amenazas; <code>/threats/dashboard</code> = panel de amenazas.</div>
+    </label>
+    <input id="pantallaEnlace" placeholder="/threats/threats">
+  </fieldset>
+
   <fieldset id="caja-formulario">
-    <legend>Pasos en el portal</legend>
+    <legend>Portal</legend>
     <label for="urlBusqueda">URL del portal (opcional)
       <div class="ayuda">Déjala vacía para usar la extensión desde dentro del portal: los pasos empiezan en la página que tengas abierta al pulsar el icono.
       Si la rellenas, se usará siempre esa página, estés donde estés.</div>
     </label>
     <input id="urlBusqueda" placeholder="Vacío = la pestaña actual">
+    <label for="obPanel">OB del panel</label>
+    <input id="obPanel" placeholder="Global">
+  </fieldset>
 
+  <fieldset id="caja-pasos">
+    <legend>Pasos en el portal</legend>
     <label>Pasos que se hacen para cada referencia, en orden
       <div class="ayuda">
         <b>panelCliente</b>: abre el panel de la barra superior y pulsa en cascada OB → cliente (lo escribe en su buscador) → unidad → entrar.
@@ -75,10 +92,6 @@
 
     <div class="fila">
       <div>
-        <label for="obPanel">OB del panel</label>
-        <input id="obPanel" placeholder="Global">
-      </div>
-      <div>
         <label for="tipoPorDefecto">Tipo si la referencia no lo lleva</label>
         <input id="tipoPorDefecto">
       </div>
@@ -100,10 +113,11 @@
     <div class="ayuda">
       <b>Nombre</b>: como aparece en el desplegable del portal. <b>Código en referencia</b>: la parte de la referencia que indica el cliente (ej. <code>ABAI</code>).
       <b>Valor en desplegable</b>: solo si la opción del desplegable no se llama igual que el nombre.
+      <b>Enlace</b>: dirección del cliente en el portal (sin <code>?URL=…</code>).
       <b>Alias</b>: otros nombres separados por comas. <b>Patrón</b>: expresión regular para casos especiales (ej. <code>^A\d{6}$</code>).
     </div>
     <table>
-      <thead><tr><th>Nombre</th><th>Código en referencia</th><th>Valor en desplegable</th><th>Alias</th><th>Patrón (opcional)</th><th></th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Código en referencia</th><th>Enlace</th><th>Valor en desplegable</th><th>Alias</th><th>Patrón (opcional)</th><th></th></tr></thead>
       <tbody id="clientes"></tbody>
     </table>
     <button id="anadirCliente">+ Añadir cliente</button>

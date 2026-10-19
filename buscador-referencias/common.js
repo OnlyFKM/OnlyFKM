@@ -1,9 +1,21 @@
 // Código compartido entre el popup, la página de opciones y el service worker.
 
 const CONFIG_POR_DEFECTO = {
+  // Cambia cuando la configuración guardada de versiones anteriores ya no sirve (ver cargarConfig).
+  version: 3,
+
+  // "enlace": se abre el enlace directo del cliente (columna "enlace") y se hacen los pasos de pasosEnlace.
   // "url": cada búsqueda es una URL directa construida con una plantilla.
   // "formulario": se abre el portal y se ejecuta la secuencia de pasos (elegir cliente, menús, buscar...).
-  modo: "formulario",
+  modo: "enlace",
+
+  // Modo "enlace": pantalla del cliente que se abre (parámetro ?URL= del enlace) y pasos que se hacen en ella.
+  // El modo Digital Risk Protection se activa a mano en el portal antes de usar la extensión.
+  pantallaEnlace: "/threats/threats",
+  pasosEnlace: [
+    { accion: "escribir", selector: "", texto: "{ref}" },
+    { accion: "enviar", selector: "", texto: "" }
+  ],
 
   // Modo "url". Marcadores disponibles: {cliente} (valor del cliente), {nombre} y {ref}.
   urlPlantilla: "https://portal.ejemplo.com/buscar?cliente={cliente}&ref={ref}",
@@ -52,7 +64,13 @@ const CONFIG_POR_DEFECTO = {
 
 async function cargarConfig() {
   // Se usa storage.local: storage.sync limita cada elemento a 8 KB y la lista de clientes no cabe.
-  const { config } = await chrome.storage.local.get("config");
+  let { config } = await chrome.storage.local.get("config");
+  if (config && (config.version || 0) < 3) {
+    // Antes de la versión 3 no había enlaces directos: se descartan los clientes y el modo guardados
+    // y se conservan los ajustes que siguen valiendo.
+    const { modo, clientes, version, ...resto } = config;
+    config = resto;
+  }
   const resultado = { ...CONFIG_POR_DEFECTO, ...(config || {}) };
   // La URL de ejemplo de versiones anteriores equivale a no tener URL.
   if (/portal\.ejemplo\.com/.test(resultado.urlBusqueda)) resultado.urlBusqueda = "";
@@ -89,12 +107,11 @@ function buscarClientePorTexto(texto, clientes) {
 }
 
 // Busca el cliente cuyo código aparece dentro de la referencia.
-// El código no puede ir pegado a otras letras (así "TE-123" no se confunde con "TEFCORP-123");
-// si varios encajan gana el más largo. Si ninguno, se prueba con el código al principio de la referencia.
+// El código no puede ir pegado a otras letras (así "TE-123" no se confunde con "TEFCORP-123", ni
+// "TEFCORP-123" se asigna a "TE" si TEFCORP no está en la lista); si varios encajan gana el más largo.
 function buscarClientePorCodigo(ref, clientes) {
   const r = String(ref).toUpperCase();
   let mejor = null;
-  let mejorAlInicio = null;
   for (const c of clientes) {
     const codigo = String(c.codigo || "").trim().toUpperCase();
     if (!codigo) continue;
@@ -108,9 +125,8 @@ function buscarClientePorCodigo(ref, clientes) {
       }
       i = r.indexOf(codigo, i + 1);
     }
-    if (r.startsWith(codigo) && (!mejorAlInicio || codigo.length > mejorAlInicio.codigo.length)) mejorAlInicio = c;
   }
-  return mejor || mejorAlInicio;
+  return mejor;
 }
 
 // Busca el cliente cuyo patrón encaja con la referencia.
@@ -194,6 +210,18 @@ function tipoDeReferencia(ref, cliente, config) {
   return { tipo, modo: encontrado ? encontrado.modo : "" };
 }
 
+// Enlace directo del cliente con la pantalla que se quiere abrir (?URL=/threats/threats).
+function construirEnlace(cliente, pantalla) {
+  if (!cliente.enlace) return "";
+  const base = cliente.enlace.replace(/\?.*$/, "");
+  return pantalla ? `${base}?URL=${encodeURIComponent(pantalla)}` : base;
+}
+
+// Pasos del modo elegido.
+function pasosDe(config) {
+  return (config.modo === "enlace" ? config.pasosEnlace : config.pasos) || [];
+}
+
 function construirUrl(plantilla, cliente, ref) {
   return plantilla
     .replace(/\{cliente\}/g, encodeURIComponent(cliente.valor || cliente.nombre))
@@ -217,6 +245,7 @@ if (typeof module !== "undefined") {
     analizarTexto,
     buscarClientePorCodigo,
     tipoDeReferencia,
+    construirEnlace,
     construirUrl,
     origenDe,
     normalizar

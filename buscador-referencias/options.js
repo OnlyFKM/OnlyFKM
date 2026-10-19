@@ -1,17 +1,18 @@
 const $ = (id) => document.getElementById(id);
-const CAMPOS_TEXTO = ["urlPlantilla", "urlBusqueda", "tipoPorDefecto", "obPanel"];
+const CAMPOS_TEXTO = ["urlPlantilla", "urlBusqueda", "tipoPorDefecto", "obPanel", "pantallaEnlace"];
 const CAMPOS_NUMERO = ["esperaEntrePasosMs", "timeoutMs", "retardoEntrePestanasMs"];
 const ACCIONES = ["panelCliente", "seleccionar", "clic", "escribir", "enviar", "esperar"];
 const CAMPOS_CHECK = ["enSecuencia", "activarPestanas"];
-const COLUMNAS = ["nombre", "codigo", "valor", "alias", "patron"];
+const COLUMNAS = ["nombre", "codigo", "enlace", "valor", "alias", "patron"];
 
 function pintar(config) {
   document.querySelectorAll('input[name="modo"]').forEach((r) => (r.checked = r.value === config.modo));
   CAMPOS_TEXTO.forEach((c) => ($(c).value = config[c] || ""));
   CAMPOS_NUMERO.forEach((c) => ($(c).value = config[c]));
   CAMPOS_CHECK.forEach((c) => ($(c).checked = !!config[c]));
-  $("pasos").textContent = "";
-  config.pasos.forEach(anadirPaso);
+  // Cada modo tiene su propia lista de pasos; la tabla muestra la del modo elegido.
+  pasosPorModo = { formulario: config.pasos, enlace: config.pasosEnlace };
+  modoMostrado = null;
   $("tipos").textContent = "";
   config.tipos.forEach(anadirTipo);
   $("clientes").textContent = "";
@@ -132,18 +133,39 @@ function actualizarPorDefecto(valor = $("clientePorDefecto").value) {
   sel.value = valor || "";
 }
 
+let pasosPorModo = {};
+let modoMostrado = null;
+
+function modoElegido() {
+  return document.querySelector('input[name="modo"]:checked')?.value || "enlace";
+}
+
 function actualizarModo() {
-  const modo = document.querySelector('input[name="modo"]:checked')?.value || "formulario";
+  const modo = modoElegido();
   $("caja-url").hidden = modo !== "url";
+  $("caja-enlace").hidden = modo !== "enlace";
   $("caja-formulario").hidden = modo !== "formulario";
+  $("caja-pasos").hidden = modo === "url";
+  if (modo === "url" || modo === modoMostrado) return;
+  if (modoMostrado) pasosPorModo[modoMostrado] = leerPasos();
+  $("pasos").textContent = "";
+  (pasosPorModo[modo] || []).forEach(anadirPaso);
+  modoMostrado = modo;
+}
+
+function leerPasos() {
+  return leerFilas($("pasos")).filter((p) => p.texto || p.selector || p.accion === "enviar");
 }
 
 function leer() {
-  const config = { modo: document.querySelector('input[name="modo"]:checked')?.value || "formulario" };
+  const config = { modo: modoElegido() };
   CAMPOS_TEXTO.forEach((c) => (config[c] = $(c).value.trim()));
   CAMPOS_NUMERO.forEach((c) => (config[c] = Number($(c).value) || 0));
   CAMPOS_CHECK.forEach((c) => (config[c] = $(c).checked));
-  config.pasos = leerFilas($("pasos")).filter((p) => p.texto || p.selector || p.accion === "enviar");
+  if (modoMostrado) pasosPorModo[modoMostrado] = leerPasos();
+  config.pasos = pasosPorModo.formulario || [];
+  config.pasosEnlace = pasosPorModo.enlace || [];
+  config.version = CONFIG_POR_DEFECTO.version;
   config.tipos = leerFilas($("tipos"))
     .filter((t) => t.letra && t.modo)
     .map((t) => ({ letra: t.letra.toUpperCase(), modo: t.modo }));
@@ -159,6 +181,7 @@ function validar(config) {
   if ((config.modo === "url" || url) && !origenDe(url)) errores.push("La URL del portal no es válida.");
   if (config.modo === "url" && !config.urlPlantilla.includes("{ref}")) errores.push("La plantilla debe incluir {ref}.");
   if (config.modo === "formulario" && !config.pasos.length) errores.push("Añade al menos un paso.");
+  if (config.modo === "enlace" && !config.clientes.some((c) => c.enlace)) errores.push("Ningún cliente tiene enlace.");
   for (const c of config.clientes) {
     if (!c.patron) continue;
     try {
@@ -181,8 +204,14 @@ async function guardar() {
   if (errores.length) return estado(errores.join(" "), "aviso");
 
   // En modo formulario hace falta permiso para rellenar las páginas del portal.
-  if (config.modo === "formulario" && config.urlBusqueda) {
-    const concedido = await chrome.permissions.request({ origins: [origenDe(config.urlBusqueda)] });
+  const origenPermiso =
+    config.modo === "enlace"
+      ? origenDe((config.clientes.find((c) => c.enlace) || {}).enlace || "")
+      : config.modo === "formulario" && config.urlBusqueda
+        ? origenDe(config.urlBusqueda)
+        : null;
+  if (origenPermiso) {
+    const concedido = await chrome.permissions.request({ origins: [origenPermiso] });
     if (!concedido) return estado("Guardado cancelado: hay que permitir el acceso al portal.", "aviso");
   }
 

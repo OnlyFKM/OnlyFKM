@@ -2,7 +2,7 @@
 
 Extensión de navegador para Chrome y Edge (Manifest V3, el mismo código vale para los dos).
 Pegas una lista de referencias de **distintos clientes**, la extensión detecta a qué cliente pertenece cada una
-y abre una pestaña del portal por referencia, eligiendo el cliente en el desplegable y lanzando la búsqueda.
+y abre una pestaña del portal por referencia: entra directamente en el cliente con su enlace y lanza la búsqueda.
 
 ## Instalación
 
@@ -18,9 +18,19 @@ y abre una pestaña del portal por referencia, eligiendo el cliente en el desple
 
 Clic derecho en el icono → **Opciones** (o el enlace *Configuración* del popup).
 
+Viene lista para usar: normalmente solo hay que pulsar **Guardar** la primera vez para dar permiso
+de acceso al portal (`cybersecurity.telefonica.com`).
+
 ### 1. Cómo se busca en el portal
 
-**Opción A: URL directa.** Haz una búsqueda a mano y fíjate en la barra de direcciones.
+**Enlace directo de cada cliente** (el modo por defecto). Cada cliente tiene su enlace al portal
+(`…/clients/1636/units/CAF`). La extensión lo abre con la pantalla del listado de amenazas
+(`?URL=/threats/threats`, se cambia en Opciones) y hace dos pasos: escribe la referencia en el buscador y pulsa Intro.
+Como cada pestaña entra en su cliente por su enlace, las referencias se abren en paralelo y tarda unos segundos.
+
+**Antes de usarla, activa el modo Digital Risk Protection en el portal**: la extensión no lo cambia.
+
+**Opción A: URL con plantilla.** Haz una búsqueda a mano y fíjate en la barra de direcciones.
 Si el cliente y la referencia aparecen en la URL, por ejemplo
 `https://portal.com/expedientes?cliente=1234&ref=ABC001`, usa el modo URL con la plantilla:
 
@@ -30,7 +40,7 @@ https://portal.com/expedientes?cliente={cliente}&ref={ref}
 
 Es el modo más rápido y fiable.
 
-**Opción B: seguir unos pasos en el portal** (la que viene configurada). Para cada referencia la extensión abre el portal
+**Opción B: seguir unos pasos en el portal** (para clientes sin enlace directo). Para cada referencia la extensión abre el portal
 y repite lo que harías a mano. Pasos por defecto:
 
 | # | Acción | Texto | Qué hace |
@@ -64,25 +74,29 @@ Si prefieres que funcione desde cualquier pestaña, pon la URL en Opciones.
 
 ### 2. Clientes
 
-La extensión ya trae cargados los **168 clientes** de `referencias.xlsx` con su código (`ABAI`, `SERGAS`, `TEFCORP`…),
-que está en `clientes.js`. En Opciones puedes filtrarlos, editarlos o añadir más.
+La extensión trae **174 clientes** con su código y su enlace directo, en `clientes.js`:
+los 135 de `referencias.xlsx` que tienen enlace en el buscador del equipo, más 39 que solo estaban en el buscador
+(Inditex, Enagas, Telxius…). Los 33 del Excel sin enlace (Cabildos, Consells, MSF Belgium/France/Netherlands,
+Telefonica Corporativo…) no están: sus referencias aparecen como *sin cliente*. Para añadir uno, en Opciones → Clientes
+pon su nombre, código y enlace (`https://cybersecurity.telefonica.com/security-service/tenants/1/socs/…/clients/…/units/CÓDIGO`).
 
 | Columna | Para qué sirve |
 |---|---|
 | Nombre | Como aparece en el desplegable del portal |
-| Código en referencia | La parte de la referencia que indica el cliente |
+| Código en referencia | La parte de la referencia que indica el cliente (coincide con la unidad del enlace) |
+| Enlace | Dirección del cliente en el portal, sin `?URL=…` |
 | Valor en desplegable | Solo si la opción del desplegable no se llama igual que el nombre |
 | Alias | Otras formas de escribir el cliente, separadas por comas |
 | Patrón | Expresión regular opcional para casos especiales |
 
 **Cómo se detecta el cliente:** se busca el código dentro de la referencia sin que vaya pegado a otras letras
 (`TE-2024-1` → Telefonica España, `TEFCORP-2024-1` → Telefonica Corporativo, `INC-SERGAS-778` → SERGAS).
-Si encajan varios códigos gana el más largo. Si no encaja ninguno así, se prueba con el código al principio de la referencia
-(`sergas20240001` → SERGAS).
+Si encajan varios códigos gana el más largo. Un código pegado a otras letras nunca se usa: `TEFCORP-D-9` no se asigna
+a `TE` aunque TEFCORP no esté en la lista (sale *sin cliente*).
 
 ## Uso
 
-Con el portal abierto en la pestaña actual, pulsa el icono, pega las referencias (una por línea o separadas por espacios o comas) y pulsa **Abrir N pestañas**:
+Con el modo Digital Risk Protection activado en el portal, pulsa el icono, pega las referencias (una por línea o separadas por espacios o comas) y pulsa **Abrir N pestañas**:
 
 ```
 ABAI-12345 TEFCORP-2024-002

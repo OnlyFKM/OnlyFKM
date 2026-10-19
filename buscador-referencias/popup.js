@@ -31,24 +31,32 @@ async function iniciar() {
 async function comprobarPortal() {
   const div = $("portal");
   div.textContent = "";
-  if (config.modo !== "formulario") return;
+  if (config.modo === "url") return;
 
   let url = config.urlBusqueda;
-  if (!url) {
+  if (config.modo === "enlace") {
+    // Todos los enlaces directos van al mismo portal: basta con el primero.
+    const conEnlace = config.clientes.find((c) => c.enlace);
+    url = conEnlace ? conEnlace.enlace : "";
+  } else if (!url) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     url = tab && /^https?:/.test(tab.url || "") ? tab.url : "";
   }
   const origen = url ? origenDe(url) : null;
   if (!origen) {
     portal = { url: "", permitido: false };
-    div.innerHTML = '<span class="aviso">Abre el portal en esta pestaña y vuelve a pulsar el icono.</span>';
+    div.innerHTML =
+      config.modo === "enlace"
+        ? '<span class="aviso">Ningún cliente tiene enlace directo. Revisa la Configuración.</span>'
+        : '<span class="aviso">Abre el portal en esta pestaña y vuelve a pulsar el icono.</span>';
     return;
   }
 
   const permitido = await chrome.permissions.contains({ origins: [origen] });
   portal = { url, permitido };
   const host = new URL(url).host;
-  div.append(`Portal: ${host}${config.urlBusqueda ? "" : " (pestaña actual)"}`);
+  const detalle = config.modo === "enlace" ? " (enlace directo de cada cliente)" : config.urlBusqueda ? "" : " (pestaña actual)";
+  div.append(`Portal: ${host}${detalle}`);
   if (!permitido) {
     const boton = document.createElement("button");
     boton.textContent = "Permitir acceso";
@@ -101,7 +109,7 @@ function pintarLista() {
     });
 
     const tipo = document.createElement("small");
-    if (item.cliente && config.modo === "formulario") {
+    if (item.cliente && pasosDe(config).some((p) => String(p.texto || "").includes("{modo}"))) {
       const t = tipoDeReferencia(item.ref, item.cliente, config);
       tipo.textContent = t.modo ? t.tipo : `${t.tipo || "?"} ✗`;
       tipo.title = t.modo || "Tipo de referencia sin modo configurado: fallará";
@@ -118,7 +126,7 @@ function pintarLista() {
     ? `${items.length} referencia(s) detectada(s)` + (sinCliente ? ` · ${sinCliente} sin cliente` : "")
     : "";
   $("resumen").className = sinCliente ? "aviso" : "suave";
-  $("abrir").disabled = validas === 0 || (config.modo === "formulario" && !portal.permitido);
+  $("abrir").disabled = validas === 0 || (config.modo !== "url" && !portal.permitido);
   $("abrir").textContent = validas ? `Abrir ${validas} pestaña(s)` : "Abrir pestañas";
 }
 
