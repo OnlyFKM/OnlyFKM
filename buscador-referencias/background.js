@@ -1,8 +1,19 @@
 importScripts("clientes.js", "common.js");
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-// Pestañas que abre la propia extensión (para no confundirlas con las que abre el portal).
+// Pestañas que abre la propia extensión o que ya tienen dueño (para no confundirlas con las que abre el portal).
 const propias = new Set();
+
+// Candado para que los pasos que pueden abrir pestañas se hagan de uno en uno: así cada pestaña nueva
+// se asigna sin duda a la referencia que la abrió, aunque las referencias se procesen en paralelo.
+let cola = Promise.resolve();
+function conCandado(fn) {
+  const resultado = cola.then(fn, fn);
+  cola = resultado.catch(() => {});
+  return resultado;
+}
+// Pasos que pueden abrir la ficha o el cliente en una pestaña nueva.
+const ACCIONES_QUE_ABREN_PESTANAS = ["abrirResultado", "panelCliente"];
 
 chrome.runtime.onMessage.addListener((msg, _sender, responder) => {
   if (msg && msg.tipo === "abrir") {
@@ -75,8 +86,11 @@ async function abrirUna(config, cliente, ref) {
   // Para reconocer las pestañas que abra el portal durante los pasos.
   config.origenPortal = origenDe(inicio);
 
-  const tab = await chrome.tabs.create({ url: inicio, active });
-  propias.add(tab.id);
+  const tab = await conCandado(async () => {
+    const t = await chrome.tabs.create({ url: inicio, active });
+    propias.add(t.id);
+    return t;
+  });
   let tabId = tab.id;
   await esperarCarga(tabId, config.timeoutMs);
 
@@ -94,7 +108,7 @@ async function abrirUna(config, cliente, ref) {
 }
 
 // Acciones que pueden recargar la página: si Chrome corta el paso por la navegación, se da por hecho.
-const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente"];
+const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente", "abrirResultado"];
 
 async function hacerPasos(config, cliente, valores, tabId, nuevas) {
   const traza = []; // lo que se ha hecho, para mostrarlo en el popup si algo falla
@@ -112,32 +126,54 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
     const args = [paso.accion, paso.selector || "", textos, config.timeoutMs, { ob: config.obPanel }];
     const navega = ACCIONES_QUE_NAVEGAN.includes(paso.accion);
-    let r = await ejecutar(tabId, pasoEnPagina, args);
-    if (!r.ok && r.navegando && !navega) {
-      // La página se estaba recargando: se espera a que termine y se repite el paso.
-      await esperarCarga(tabId, config.timeoutMs);
-      r = await ejecutar(tabId, pasoEnPagina, args);
-    }
-    if (!r.ok && !(r.navegando && navega)) {
-      const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
-      error.traza = [...traza, ...(r.traza || [])];
-      throw error;
-    }
-    traza.push(`paso ${n + 1} ${paso.accion} ✓`);
-    for (const t of r.traza || []) traza.push(`   · ${t}`);
+    const abrePestanas = ACCIONES_QUE_ABREN_PESTANAS.includes(paso.accion);
 
-    // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
-    await esperar(config.esperaEntrePasosMs);
-    // Pestaña abierta por la página durante el paso: la que indique esta pestaña como origen
-    // o, si el navegador no lo indica bien, cualquier pestaña nueva del mismo portal.
-    const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, config.origenPortal);
-    if (abierta) {
-      const anterior = tabId;
-      tabId = abierta.id;
-      propias.add(tabId);
-      propias.delete(anterior);
-      chrome.tabs.remove(anterior).catch(() => {});
+    const hacerPaso = async () => {
+      if (abrePestanas) nuevas.length = 0; // solo cuentan las pestañas creadas durante este paso
+      let r = await ejecutar(tabId, pasoEnPagina, args);
+      if (!r.ok && r.navegando && !navega) {
+        // La página se estaba recargando: se espera a que termine y se repite el paso.
+        await esperarCarga(tabId, config.timeoutMs);
+        r = await ejecutar(tabId, pasoEnPagina, args);
+      }
+      if (!r.ok && !(r.navegando && navega)) {
+        const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
+        error.traza = [...traza, ...(r.traza || [])];
+        throw error;
+      }
+      traza.push(`paso ${n + 1} ${paso.accion} ✓`);
+      for (const t of r.traza || []) traza.push(`   · ${t}`);
+
+      // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
+      await esperar(config.esperaEntrePasosMs);
+      // Pestaña abierta por la página durante el paso: la que indique esta pestaña como origen o, solo en los
+      // pasos con candado (nadie más puede estar abriendo pestañas), cualquier pestaña nueva del mismo portal.
+      const abierta = await pestanaAbiertaPorElPaso(
+        nuevas.splice(0),
+        tabId,
+        abrePestanas ? config.origenPortal : null
+      );
+      if (abierta) {
+        const anterior = tabId;
+        tabId = abierta.id;
+        propias.add(tabId);
+        propias.delete(anterior);
+        chrome.tabs.remove(anterior).catch(() => {});
+        traza.push(`   · sigo en la pestaña nueva que ha abierto el portal`);
+      }
+    };
+
+    if (paso.accion === "abrirResultado") {
+      // Se espera a que salgan los resultados fuera del candado; dentro solo se pulsa.
+      const espera = await ejecutar(tabId, pasoEnPagina, [paso.accion, "", textos, config.timeoutMs, { soloEsperar: true }]);
+      if (!espera.ok && !espera.navegando) {
+        const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0]}): ${espera.error}`);
+        error.traza = traza;
+        throw error;
+      }
     }
+    if (abrePestanas) await conCandado(hacerPaso);
+    else await hacerPaso();
     await esperarCarga(tabId, config.timeoutMs);
   }
   return tabId;
@@ -148,7 +184,7 @@ async function pestanaAbiertaPorElPaso(creadas, tabId, origen) {
     if (propias.has(t.id)) continue;
     const info = await chrome.tabs.get(t.id).catch(() => null);
     if (!info) continue;
-    if (info.openerTabId === tabId || origenDe(info.pendingUrl || info.url || "") === origen) return info;
+    if (info.openerTabId === tabId || (origen && origenDe(info.pendingUrl || info.url || "") === origen)) return info;
   }
   return null;
 }
@@ -477,6 +513,44 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     if (!el) return { ok: false, error: `no se encontró "${textos[0] || selector}" en la página` };
     pulsar(el);
     return { ok: true, traza: [`pulso "${(el.innerText || el.value || el.textContent || "").trim().slice(0, 40)}" (${el.tagName.toLowerCase()})`] };
+  }
+
+  if (accion === "abrirResultado") {
+    // Pulsa, en la lista de resultados, el elemento que contiene exactamente la referencia
+    // (sin confundir "CAF-D-1731" con "CAF-D-17317") para abrir su ficha.
+    const ref = norm(textos[0]);
+    if (!ref) return { ok: false, error: "falta el texto a buscar en los resultados" };
+    const esc = ref.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const exacta = new RegExp(`(^|[^a-z0-9_-])${esc}($|[^a-z0-9_-])`);
+    const candidatos = () => {
+      const els = [...document.querySelectorAll("a,td,th,span,div,p,li,button,[role=cell],[role=gridcell],[role=row]")].filter(
+        (e) => visible(e) && !e.closest("input,textarea,select,label") && exacta.test(textoDe(e))
+      );
+      // Los más internos que contienen la referencia (la celda o el enlace, no la tabla entera).
+      return els.filter((e) => !els.some((o) => o !== e && e.contains(o)));
+    };
+    const encontrados = await esperarA(() => {
+      const c = candidatos();
+      return c.length ? c : null;
+    });
+    if (!encontrados) return { ok: false, error: `la búsqueda no muestra ningún resultado con "${textos[0]}"` };
+    if (extra.soloEsperar) return { ok: true };
+    const traza = [];
+    if (encontrados.length > 1) traza.push(`${encontrados.length} elementos con la referencia: uso el primero`);
+    const el = encontrados[0];
+    // Preferencia: el propio enlace; si no, un enlace de su fila que lleve la referencia; si no, el primer enlace de la fila;
+    // si no hay enlaces, se pulsa la celda (muchas tablas abren la ficha al pulsar la fila).
+    const fila = el.closest("tr,[role=row],li,.row,[class*=row]") || el.parentElement;
+    const enlacesFila = fila ? [...fila.querySelectorAll("a[href]")].filter(visible) : [];
+    const destino =
+      el.closest("a[href]") ||
+      el.querySelector("a[href]") ||
+      enlacesFila.find((a) => exacta.test(textoDe(a))) ||
+      enlacesFila[0] ||
+      el;
+    traza.push(`pulso "${(destino.innerText || destino.textContent || "").trim().slice(0, 40)}" (${destino.tagName.toLowerCase()})`);
+    pulsar(destino);
+    return { ok: true, traza };
   }
 
   if (accion === "campo") {

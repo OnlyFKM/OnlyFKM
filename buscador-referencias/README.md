@@ -25,16 +25,19 @@ de acceso al portal (`cybersecurity.telefonica.com`).
 
 **Enlace directo de cada cliente** (el modo por defecto). Cada cliente tiene su enlace al portal
 (`…/clients/1636/units/CAF`). La extensión lo abre con la pantalla del listado de amenazas
-(`?URL=/threats/threats`, se cambia en Opciones) y hace tres pasos:
+(`?URL=/threats/threats`, se cambia en Opciones) y hace cuatro pasos:
 
 | # | Acción | Texto | Etiqueta | Qué hace |
 |---|---|---|---|---|
 | 1 | clic | `Filtros` | | Abre el panel de filtros |
 | 2 | campo | `{ref}` | `Referencia` | Escribe la referencia en el campo *Referencia* (no en *Referencia externa* ni en otros) |
 | 3 | clic | `Buscar` | | Pulsa el *Buscar* del panel de filtros (si hay varios, el que está junto al campo) |
+| 4 | abrirResultado | `{ref}` | | Espera a los resultados y pulsa el que tiene **exactamente** esa referencia (`CAF-D-1731` no abre `CAF-D-17317`) para abrir la ficha de la amenaza |
 
 Si el panel de filtros ya estaba abierto y el paso 1 lo cierra, el paso 2 lo detecta y vuelve a pulsar *Filtros*.
-La pestaña se queda abierta con el resultado de la búsqueda.
+Cada pestaña acaba en la ficha de su amenaza. Si el portal abre la ficha en una pestaña nueva, la extensión se queda
+con esa y cierra la del listado. El clic del paso 4 se hace de una referencia en una para que cada ficha nueva
+se asigne a la referencia correcta.
 Como cada pestaña entra en su cliente por su enlace, las referencias se abren en paralelo y tarda unos segundos.
 
 **Antes de usarla, activa el modo Digital Risk Protection en el portal**: la extensión no lo cambia.
