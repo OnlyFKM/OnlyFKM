@@ -2,7 +2,7 @@
 
 const CONFIG_POR_DEFECTO = {
   // Cambia cuando la configuración guardada de versiones anteriores ya no sirve (ver cargarConfig).
-  version: 3,
+  version: 4,
 
   // "enlace": se abre el enlace directo del cliente (columna "enlace") y se hacen los pasos de pasosEnlace.
   // "url": cada búsqueda es una URL directa construida con una plantilla.
@@ -12,9 +12,11 @@ const CONFIG_POR_DEFECTO = {
   // Modo "enlace": pantalla del cliente que se abre (parámetro ?URL= del enlace) y pasos que se hacen en ella.
   // El modo Digital Risk Protection se activa a mano en el portal antes de usar la extensión.
   pantallaEnlace: "/threats/threats",
+  // En el listado de amenazas: abrir Filtros, escribir la referencia en el campo "Referencia" y pulsar Buscar.
   pasosEnlace: [
-    { accion: "escribir", selector: "", texto: "{ref}" },
-    { accion: "enviar", selector: "", texto: "" }
+    { accion: "clic", selector: "", texto: "Filtros" },
+    { accion: "campo", selector: "Referencia", texto: "{ref}" },
+    { accion: "clic", selector: "", texto: "Buscar" }
   ],
 
   // Modo "url". Marcadores disponibles: {cliente} (valor del cliente), {nombre} y {ref}.
@@ -31,6 +33,7 @@ const CONFIG_POR_DEFECTO = {
   //   seleccionar: elige una opción en un desplegable (selector vacío = el <select> que tenga esa opción).
   //   clic:        pulsa el elemento con ese texto visible (y/o que encaje con el selector).
   //   escribir:    escribe el texto en un cuadro (selector vacío = el primer cuadro de búsqueda visible).
+  //   campo:       escribe el texto en el campo cuya etiqueta es "selector" (p. ej. "Referencia").
   //   enviar:      pulsa el botón del selector o, si está vacío, envía el formulario / pulsa Intro.
   //   esperar:     espera los milisegundos indicados en "texto".
   // Marcadores en "texto": {cliente}, {ref}, {modo} (según el tipo de referencia) y {tipo}.
@@ -70,6 +73,11 @@ async function cargarConfig() {
     // y se conservan los ajustes que siguen valiendo.
     const { modo, clientes, version, ...resto } = config;
     config = resto;
+  }
+  if (config && (config.version || 0) < 4) {
+    // Los pasos del enlace directo de la versión 3 (escribir en el primer buscador e Intro) pasan a Filtros → Referencia → Buscar.
+    const { pasosEnlace, ...resto } = config;
+    config = { ...resto, version: 4 };
   }
   const resultado = { ...CONFIG_POR_DEFECTO, ...(config || {}) };
   // La URL de ejemplo de versiones anteriores equivale a no tener URL.

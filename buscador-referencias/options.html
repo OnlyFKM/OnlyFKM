@@ -70,13 +70,14 @@
         <b>panelCliente</b>: abre el panel de la barra superior y pulsa en cascada OB → cliente (lo escribe en su buscador) → unidad → entrar.
         <b>seleccionar</b>: elige una opción en un desplegable (selector vacío = el desplegable que tenga esa opción).
         <b>clic</b>: pulsa el elemento con ese texto visible. <b>escribir</b>: escribe en un cuadro (selector vacío = el primer cuadro de búsqueda).
+        <b>campo</b>: escribe el texto en el campo cuya <b>etiqueta</b> pongas en la columna de la derecha (p. ej. <code>Referencia</code>).
         <b>enviar</b>: pulsa el botón del selector o, si está vacío, pulsa Intro. <b>esperar</b>: espera los milisegundos del texto.<br>
         En el texto puedes usar <code>{cliente}</code>, <code>{ref}</code>, <code>{modo}</code> (según el tipo de referencia) y <code>{tipo}</code>.
         El selector CSS es opcional: úsalo solo si el texto no basta (clic derecho → Inspeccionar).
       </div>
     </label>
     <table>
-      <thead><tr><th>#</th><th>Acción</th><th>Texto</th><th>Selector CSS (opcional)</th><th></th></tr></thead>
+      <thead><tr><th>#</th><th>Acción</th><th>Texto</th><th>Selector CSS / etiqueta</th><th></th></tr></thead>
       <tbody id="pasos"></tbody>
     </table>
     <button id="anadirPaso">+ Añadir paso</button>

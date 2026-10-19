@@ -195,8 +195,8 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
   const visible = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
   const textoDe = (el) => norm(el.tagName === "INPUT" ? el.value : el.innerText || el.textContent);
   const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
-  const esperarA = async (fn) => {
-    const limite = Date.now() + timeoutMs;
+  const esperarA = async (fn, ms = timeoutMs) => {
+    const limite = Date.now() + ms;
     while (Date.now() < limite) {
       const r = fn();
       if (r) return r;
@@ -205,17 +205,35 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     return fn();
   };
   const CLICABLES =
-    "a,button,[role=button],[role=tab],[role=menuitem],[role=option],[role=link],[role=switch],li,label,span,div,td,p,h1,h2,h3,h4,h5,h6";
+    "a,button,input[type=submit],input[type=button],[role=button],[role=tab],[role=menuitem],[role=option],[role=link],[role=switch],li,label,span,div,td,p,h1,h2,h3,h4,h5,h6";
+
+  // Campo rellenado en un paso anterior ("escribir" o "campo"): sirve para elegir, entre varios botones
+  // con el mismo texto (p. ej. "Buscar"), el que está junto a él.
+  const distanciaAlCampo = (el) => {
+    const campo = document.querySelector("[data-buscador-referencias]");
+    if (!campo) return 0;
+    const a = el.getBoundingClientRect();
+    const b = campo.getBoundingClientRect();
+    return Math.hypot(a.left + a.width / 2 - (b.left + b.width / 2), a.top + a.height / 2 - (b.top + b.height / 2));
+  };
+  const marcarCampo = (el) => {
+    document.querySelectorAll("[data-buscador-referencias]").forEach((e) => e.removeAttribute("data-buscador-referencias"));
+    el.setAttribute("data-buscador-referencias", "1");
+  };
+  const esBoton = (el) => !!el.closest("button,a,[role=button],input[type=submit],input[type=button]");
 
   // Elemento cuyo texto visible coincide: primero exacto, luego que lo contenga; siempre el más interno.
   const porTexto = (sel, { ocultos = false, excluir = null } = {}) => {
     const els = [...document.querySelectorAll(sel || CLICABLES)].filter(
       (e) => (ocultos || visible(e)) && !(excluir && (e === excluir || e.contains(excluir)))
     );
-    const masInterno = (lista) => lista.find((e) => !lista.some((o) => o !== e && e.contains(o)));
     for (const t of buscados) {
       const exactos = els.filter((e) => textoDe(e) === t);
-      if (exactos.length) return masInterno(exactos);
+      // Los más internos; si hay varios, primero los botones y luego el más cercano al campo rellenado.
+      const internos = exactos
+        .filter((e) => !exactos.some((o) => o !== e && e.contains(o)))
+        .sort((a, b) => esBoton(b) - esBoton(a) || distanciaAlCampo(a) - distanciaAlCampo(b));
+      if (internos.length) return internos[0];
     }
     for (const t of buscados) {
       const parecidos = els.filter((e) => textoDe(e).includes(t)).sort((a, b) => textoDe(a).length - textoDe(b).length);
@@ -458,7 +476,68 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     if (!el && buscados.length) el = porTexto(selector, { ocultos: true });
     if (!el) return { ok: false, error: `no se encontró "${textos[0] || selector}" en la página` };
     pulsar(el);
-    return { ok: true };
+    return { ok: true, traza: [`pulso "${(el.innerText || el.value || el.textContent || "").trim().slice(0, 40)}" (${el.tagName.toLowerCase()})`] };
+  }
+
+  if (accion === "campo") {
+    // Escribe en el campo cuya etiqueta es "selector" (p. ej. "Referencia" en el panel de Filtros).
+    const etiqueta = norm(selector);
+    if (!etiqueta) return { ok: false, error: "falta la etiqueta del campo (columna Selector/etiqueta)" };
+    const traza = [];
+    const editable = (i) => i && visible(i) && !i.disabled && !i.readOnly && /^(INPUT|TEXTAREA)$/.test(i.tagName) &&
+      !/^(checkbox|radio|submit|button|hidden)$/i.test(i.type);
+    const coincide = (t) => {
+      const n = norm(t).replace(/[:*]+$/, "").trim();
+      return n === etiqueta || n.startsWith(etiqueta + " ");
+    };
+    const buscarCampo = () => {
+      // 1. <label> con ese texto.
+      for (const l of document.querySelectorAll("label")) {
+        if (!visible(l) || !coincide(l.innerText || l.textContent)) continue;
+        const c = l.control || l.querySelector("input,textarea") || (l.htmlFor && document.getElementById(l.htmlFor));
+        if (editable(c)) return c;
+      }
+      // 2. Campo con ese placeholder, aria-label, name, id o formcontrolname.
+      const directo = [...document.querySelectorAll("input,textarea")].find(
+        (i) => editable(i) && ["placeholder", "aria-label", "name", "id", "formcontrolname"].some((a) => coincide(i.getAttribute(a)))
+      );
+      if (directo) return directo;
+      // 3. Texto suelto con esa etiqueta (span, div, mat-label...): el primer campo que lo sigue en su bloque.
+      const textos = [...document.querySelectorAll("span,div,p,th,td,dt,mat-label,legend,strong,b,h4,h5,h6")].filter(
+        (e) => visible(e) && coincide(e.innerText || e.textContent)
+      );
+      const masInternos = textos.filter((e) => !textos.some((o) => o !== e && e.contains(o)));
+      for (const t of masInternos) {
+        let bloque = t.parentElement;
+        for (let nivel = 0; bloque && nivel < 4; nivel++, bloque = bloque.parentElement) {
+          const siguiente = [...bloque.querySelectorAll("input,textarea")].find(
+            (i) => editable(i) && (t.compareDocumentPosition(i) & Node.DOCUMENT_POSITION_FOLLOWING)
+          );
+          if (siguiente) return siguiente;
+        }
+      }
+      return null;
+    };
+
+    let campo = await esperarA(buscarCampo, Math.min(timeoutMs, 6000));
+    if (!campo) {
+      // Si el panel de filtros se había quedado abierto, el clic anterior lo ha cerrado: se vuelve a abrir.
+      // El botón puede llevar un icono delante ("⚙ Filtros"): se compara solo el texto.
+      const botones = [...document.querySelectorAll(CLICABLES)].filter(
+        (e) => visible(e) && esBoton(e) && textoDe(e).replace(/[^a-z0-9 ]/g, "").trim() === "filtros"
+      );
+      const filtros = botones.find((e) => !botones.some((o) => o !== e && e.contains(o)));
+      if (filtros) {
+        traza.push('no veo el campo: vuelvo a pulsar "Filtros"');
+        pulsar(filtros);
+        campo = await esperarA(buscarCampo);
+      }
+    }
+    if (!campo) return { ok: false, error: `no se encontró el campo "${selector}"`, traza };
+    escribirEn(campo, textos[0]);
+    marcarCampo(campo);
+    traza.push(`escribo "${textos[0]}" en el campo "${selector}"`);
+    return { ok: true, traza };
   }
 
   if (accion === "escribir") {
@@ -488,7 +567,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     }
     if (!input) return { ok: false, error: `no se encontró el cuadro de búsqueda${selector ? ` (${selector})` : ""}` };
     escribirEn(input, textos[0]);
-    input.setAttribute("data-buscador-referencias", "1");
+    marcarCampo(input);
     const nombre = input.placeholder || input.name || input.id || input.tagName.toLowerCase();
     return { ok: true, traza: [`escribo "${textos[0]}" en el cuadro "${nombre}"`] };
   }
