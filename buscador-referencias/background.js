@@ -83,9 +83,6 @@ async function abrirUna(config, cliente, ref) {
     inicio = construirEnlace(cliente, config.pantallaEnlace);
     if (!inicio) throw new Error("el cliente no tiene enlace directo (añádelo en Configuración → Clientes)");
   }
-  // Para reconocer las pestañas que abra el portal durante los pasos.
-  config.origenPortal = origenDe(inicio);
-
   const tab = await conCandado(async () => {
     const t = await chrome.tabs.create({ url: inicio, active });
     propias.add(t.id);
@@ -112,6 +109,7 @@ const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente", "
 
 async function hacerPasos(config, cliente, valores, tabId, nuevas) {
   const traza = []; // lo que se ha hecho, para mostrarlo en el popup si algo falla
+  const marcos = { ultimo: null }; // marco (iframe) donde se hizo el último paso
   for (const [n, paso] of pasosDe(config).entries()) {
     if (paso.accion === "esperar") {
       await esperar(Number(paso.texto) || 1000);
@@ -130,11 +128,11 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
     const hacerPaso = async () => {
       if (abrePestanas) nuevas.length = 0; // solo cuentan las pestañas creadas durante este paso
-      let r = await ejecutar(tabId, pasoEnPagina, args);
+      let r = await ejecutarEnSuMarco(tabId, args, marcos);
       if (!r.ok && r.navegando && !navega) {
         // La página se estaba recargando: se espera a que termine y se repite el paso.
         await esperarCarga(tabId, config.timeoutMs);
-        r = await ejecutar(tabId, pasoEnPagina, args);
+        r = await ejecutarEnSuMarco(tabId, args, marcos);
       }
       if (!r.ok && !(r.navegando && navega)) {
         const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
@@ -146,13 +144,7 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
       // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
       await esperar(config.esperaEntrePasosMs);
-      // Pestaña abierta por la página durante el paso: la que indique esta pestaña como origen o, solo en los
-      // pasos con candado (nadie más puede estar abriendo pestañas), cualquier pestaña nueva del mismo portal.
-      const abierta = await pestanaAbiertaPorElPaso(
-        nuevas.splice(0),
-        tabId,
-        abrePestanas ? config.origenPortal : null
-      );
+      const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, abrePestanas);
       if (abierta) {
         const anterior = tabId;
         tabId = abierta.id;
@@ -165,10 +157,10 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
 
     if (paso.accion === "abrirResultado") {
       // Se espera a que salgan los resultados fuera del candado; dentro solo se pulsa.
-      const espera = await ejecutar(tabId, pasoEnPagina, [paso.accion, "", textos, config.timeoutMs, { soloEsperar: true }]);
+      const espera = await ejecutarEnSuMarco(tabId, [paso.accion, "", textos, config.timeoutMs, { soloEsperar: true }], marcos);
       if (!espera.ok && !espera.navegando) {
         const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0]}): ${espera.error}`);
-        error.traza = traza;
+        error.traza = [...traza, ...(espera.traza || [])];
         throw error;
       }
     }
@@ -179,19 +171,78 @@ async function hacerPasos(config, cliente, valores, tabId, nuevas) {
   return tabId;
 }
 
-async function pestanaAbiertaPorElPaso(creadas, tabId, origen) {
+// Pestaña abierta por la página durante un paso: la que indique esta pestaña como origen o, si "conCandado"
+// (nadie más puede estar abriendo pestañas), cualquier pestaña web nueva: la ficha puede abrirse desde un marco
+// de otro dominio y el navegador no siempre indica bien quién la abrió.
+async function pestanaAbiertaPorElPaso(creadas, tabId, conCandado) {
   for (const t of creadas.reverse()) {
     if (propias.has(t.id)) continue;
     const info = await chrome.tabs.get(t.id).catch(() => null);
     if (!info) continue;
-    if (info.openerTabId === tabId || (origen && origenDe(info.pendingUrl || info.url || "") === origen)) return info;
+    if (info.openerTabId === tabId || (conCandado && /^https?:/.test(info.pendingUrl || info.url || ""))) return info;
   }
   return null;
 }
 
-async function ejecutar(tabId, func, args) {
+// El portal puede mostrar cada sección dentro de un marco (iframe): antes de cada paso se sondean todos los marcos
+// hasta encontrar en cuál está lo que busca el paso (botón, campo, resultado...) y el paso se hace solo en ese.
+async function ejecutarEnSuMarco(tabId, args, marcos) {
+  const [accion, selector, textos, timeoutMs, extra = {}] = args;
+  const limite = Date.now() + timeoutMs;
+  let candidatos = [];
+  for (;;) {
+    const res = await chrome.scripting
+      .executeScript({
+        target: { tabId, allFrames: true },
+        func: pasoEnPagina,
+        args: [accion, selector, textos, 0, { ...extra, sondear: true }]
+      })
+      .catch(() => []);
+    candidatos = res.filter((r) => r.result && r.result.ok).map((r) => r.frameId);
+    if (candidatos.length || Date.now() >= limite) break;
+    await esperar(400);
+  }
+
+  if (!candidatos.length) {
+    // No está en ningún marco: se ejecuta en la página principal (sin volver a esperar) para obtener el motivo.
+    const r = await ejecutar(tabId, pasoEnPagina, [accion, selector, textos, 500, extra], 0);
+    if (!r.ok) r.traza = [...(r.traza || []), `marcos que veo en la pestaña: ${await describirMarcos(tabId)}`];
+    return r;
+  }
+
+  // Si está en varios marcos: el del campo rellenado, el del paso anterior o la página principal.
+  let frameId = candidatos[0];
+  if (candidatos.length > 1) {
+    const conCampo = (
+      await chrome.scripting
+        .executeScript({ target: { tabId, allFrames: true }, func: () => !!document.querySelector("[data-buscador-referencias]") })
+        .catch(() => [])
+    )
+      .filter((r) => r.result)
+      .map((r) => r.frameId);
+    frameId =
+      candidatos.find((f) => conCampo.includes(f)) ??
+      (candidatos.includes(marcos.ultimo) ? marcos.ultimo : candidatos.includes(0) ? 0 : candidatos[0]);
+  }
+  marcos.ultimo = frameId;
+  const r = await ejecutar(tabId, pasoEnPagina, args, frameId);
+  if (frameId !== 0 && r.traza) r.traza = r.traza.map((t) => `${t} [en un marco de la página]`);
+  else if (frameId !== 0) r.traza = ["(dentro de un marco de la página)"];
+  return r;
+}
+
+// Direcciones de los marcos de la pestaña a los que la extensión tiene acceso (para el registro de errores).
+async function describirMarcos(tabId) {
+  const res = await chrome.scripting
+    .executeScript({ target: { tabId, allFrames: true }, func: () => location.href })
+    .catch(() => []);
+  return res.map((r) => (r.frameId === 0 ? "principal " : "marco ") + String(r.result).slice(0, 90)).join(" | ") || "ninguno";
+}
+
+async function ejecutar(tabId, func, args, frameId) {
   try {
-    const [res] = await chrome.scripting.executeScript({ target: { tabId }, func, args });
+    const target = frameId == null ? { tabId } : { tabId, frameIds: [frameId] };
+    const [res] = await chrome.scripting.executeScript({ target, func, args });
     return res && res.result ? res.result : { ok: false, navegando: true, error: "la página cambió durante el paso" };
   } catch (e) {
     // Si la página navega mientras se ejecuta el paso, Chrome corta la ejecución.
@@ -225,12 +276,16 @@ function esperarCarga(tabId, timeoutMs) {
 // ---- Función que se inyecta en la página del portal (debe ser autocontenida) ----
 
 async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
+  // Sondeo: solo se comprueba si lo que busca el paso está en este marco (sin esperar, pulsar ni escribir).
+  // Lo usa el service worker para saber en qué marco (iframe) de la página hay que hacer el paso.
+  const sondeo = !!extra.sondear;
+  if (sondeo) timeoutMs = 0;
   const norm = (s) =>
     String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
   const buscados = textos.map(norm).filter(Boolean);
   const visible = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
   const textoDe = (el) => norm(el.tagName === "INPUT" ? el.value : el.innerText || el.textContent);
-  const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
+  const dormir = (ms) => (sondeo ? Promise.resolve() : new Promise((r) => setTimeout(r, ms)));
   const esperarA = async (fn, ms = timeoutMs) => {
     const limite = Date.now() + ms;
     while (Date.now() < limite) {
@@ -279,6 +334,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
   };
 
   const pulsar = (el) => {
+    if (sondeo) return;
     el.scrollIntoView({ block: "center" });
     for (const tipo of ["mouseover", "mouseenter", "pointerdown", "mousedown", "pointerup", "mouseup"]) {
       el.dispatchEvent(new MouseEvent(tipo, { bubbles: true, cancelable: true, view: window }));
@@ -287,6 +343,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
   };
 
   const escribirEn = (input, valor) => {
+    if (sondeo) return;
     input.focus();
     // Setter nativo para que frameworks como React/Angular detecten el cambio.
     const proto = input.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
@@ -317,6 +374,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     if (!el) {
       return { ok: false, error: selector ? `no se encontró el desplegable (${selector})` : `no hay ningún desplegable con "${textos[0]}"` };
     }
+    if (sondeo) return { ok: true };
     if (el.tagName === "SELECT") {
       const opcion = opcionDe(el);
       if (!opcion) return { ok: false, error: `"${textos[0]}" no está en el desplegable` };
@@ -433,10 +491,12 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
           arriba.find((e) => e.tagName === "BUTTON");
         if (boton) boton = boton.closest("button,a,[role=button]") || boton;
       }
+      if (sondeo) return { ok: !!boton };
       if (!boton) return fallo("no se encontró el botón que abre el panel de clientes (pon su selector en el paso)");
       traza.push(`abro el panel con "${corto(boton)}"`);
       pulsar(boton);
     }
+    if (sondeo) return { ok: true };
     const panel = await esperarHasta(colClientes, timeoutMs);
     if (!panel) return fallo('no se abrió el panel con la columna "Clientes"');
     traza.push("panel abierto");
@@ -509,7 +569,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
       buscados.length ? porTexto(selector) : [...document.querySelectorAll(selector)].find(visible)
     );
     // Último intento con elementos ocultos (p. ej. enlaces de un submenú cerrado).
-    if (!el && buscados.length) el = porTexto(selector, { ocultos: true });
+    if (!el && buscados.length && !sondeo) el = porTexto(selector, { ocultos: true });
     if (!el) return { ok: false, error: `no se encontró "${textos[0] || selector}" en la página` };
     pulsar(el);
     return { ok: true, traza: [`pulso "${(el.innerText || el.value || el.textContent || "").trim().slice(0, 40)}" (${el.tagName.toLowerCase()})`] };
@@ -534,7 +594,7 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
       return c.length ? c : null;
     });
     if (!encontrados) return { ok: false, error: `la búsqueda no muestra ningún resultado con "${textos[0]}"` };
-    if (extra.soloEsperar) return { ok: true };
+    if (extra.soloEsperar || sondeo) return { ok: true };
     const traza = [];
     if (encontrados.length > 1) traza.push(`${encontrados.length} elementos con la referencia: uso el primero`);
     const el = encontrados[0];
@@ -593,14 +653,18 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
       return null;
     };
 
-    let campo = await esperarA(buscarCampo, Math.min(timeoutMs, 6000));
-    if (!campo) {
-      // Si el panel de filtros se había quedado abierto, el clic anterior lo ha cerrado: se vuelve a abrir.
-      // El botón puede llevar un icono delante ("⚙ Filtros"): se compara solo el texto.
+    // El botón puede llevar un icono delante ("⚙ Filtros"): se compara solo el texto.
+    const botonFiltros = () => {
       const botones = [...document.querySelectorAll(CLICABLES)].filter(
         (e) => visible(e) && esBoton(e) && textoDe(e).replace(/[^a-z0-9 ]/g, "").trim() === "filtros"
       );
-      const filtros = botones.find((e) => !botones.some((o) => o !== e && e.contains(o)));
+      return botones.find((e) => !botones.some((o) => o !== e && e.contains(o)));
+    };
+    let campo = await esperarA(buscarCampo, Math.min(timeoutMs, 6000));
+    if (sondeo) return { ok: !!(campo || botonFiltros()) };
+    if (!campo) {
+      // Si el panel de filtros se había quedado abierto, el clic anterior lo ha cerrado: se vuelve a abrir.
+      const filtros = botonFiltros();
       if (filtros) {
         traza.push('no veo el campo: vuelvo a pulsar "Filtros"');
         pulsar(filtros);

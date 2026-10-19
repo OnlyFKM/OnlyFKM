@@ -63,7 +63,7 @@ async function comprobarPortal() {
     boton.title = "La extensión necesita permiso para hacer los pasos en este portal";
     // Si el navegador cierra el popup al mostrar el aviso, el permiso queda igualmente concedido.
     boton.addEventListener("click", async () => {
-      if (await chrome.permissions.request({ origins: [origen] })) {
+      if (await chrome.permissions.request({ origins: origenesPortal(url) })) {
         await comprobarPortal();
         pintarLista();
       }

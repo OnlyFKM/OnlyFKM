@@ -211,7 +211,7 @@ async function guardar() {
         ? origenDe(config.urlBusqueda)
         : null;
   if (origenPermiso) {
-    const concedido = await chrome.permissions.request({ origins: [origenPermiso] });
+    const concedido = await chrome.permissions.request({ origins: origenesPortal(origenPermiso) });
     if (!concedido) return estado("Guardado cancelado: hay que permitir el acceso al portal.", "aviso");
   }
 

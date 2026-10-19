@@ -40,6 +40,11 @@ con esa y cierra la del listado. El clic del paso 4 se hace de una referencia en
 se asigne a la referencia correcta.
 Como cada pestaña entra en su cliente por su enlace, las referencias se abren en paralelo y tarda unos segundos.
 
+El portal muestra el listado de amenazas dentro de un **marco** (iframe) de la página: antes de cada paso la extensión
+busca en todos los marcos dónde está lo que necesita (el botón *Filtros*, el campo *Referencia*, el resultado…) y hace
+el paso ahí. Por eso al guardar pide permiso para `*.telefonica.com` además de `cybersecurity.telefonica.com`:
+el marco podría servirse desde otro subdominio. Si un paso no encuentra nada, **Ver qué hizo** lista los marcos que ve.
+
 **Antes de usarla, activa el modo Digital Risk Protection en el portal**: la extensión no lo cambia.
 
 **Opción A: URL con plantilla.** Haz una búsqueda a mano y fíjate en la barra de direcciones.

@@ -233,6 +233,17 @@ function pasosDe(config) {
   return (config.modo === "enlace" ? config.pasosEnlace : config.pasos) || [];
 }
 
+// Permisos que necesita la extensión en el portal: su dominio y sus subdominios hermanos
+// (las secciones del portal pueden cargarse en marcos servidos desde otro subdominio).
+function origenesPortal(url) {
+  const principal = origenDe(url);
+  if (!principal) return [];
+  const { protocol, hostname } = new URL(principal.replace(/\*$/, ""));
+  const partes = hostname.split(".");
+  const esIp = /^[\d.]+$/.test(hostname);
+  return partes.length > 2 && !esIp ? [principal, `${protocol}//*.${partes.slice(-2).join(".")}/*`] : [principal];
+}
+
 function construirUrl(plantilla, cliente, ref) {
   return plantilla
     .replace(/\{cliente\}/g, encodeURIComponent(cliente.valor || cliente.nombre))
@@ -258,6 +269,7 @@ if (typeof module !== "undefined") {
     tipoDeReferencia,
     construirEnlace,
     construirUrl,
+    origenesPortal,
     origenDe,
     normalizar
   };
