@@ -598,19 +598,39 @@ async function pasoEnPagina(accion, selector, textos, timeoutMs, extra = {}) {
     const traza = [];
     if (encontrados.length > 1) traza.push(`${encontrados.length} elementos con la referencia: uso el primero`);
     const el = encontrados[0];
-    // Preferencia: el propio enlace; si no, un enlace de su fila que lleve la referencia; si no, el primer enlace de la fila;
-    // si no hay enlaces, se pulsa la celda (muchas tablas abren la ficha al pulsar la fila).
-    const fila = el.closest("tr,[role=row],li,.row,[class*=row]") || el.parentElement;
-    const enlacesFila = fila ? [...fila.querySelectorAll("a[href]")].filter(visible) : [];
-    const destino =
-      el.closest("a[href]") ||
-      el.querySelector("a[href]") ||
-      enlacesFila.find((a) => exacta.test(textoDe(a))) ||
-      enlacesFila[0] ||
-      el;
-    traza.push(`pulso "${(destino.innerText || destino.textContent || "").trim().slice(0, 40)}" (${destino.tagName.toLowerCase()})`);
+    const fila = el.closest("tr,[role=row]") || el.parentElement;
+    // Si la propia referencia es un enlace, se usa. Si no, se pulsa la celda de la referencia (el clic llega a la fila).
+    // Nunca otro enlace de la fila: p. ej. en la columna "Casos" hay enlaces como "CARR-D-213063-0001" que no son la amenaza.
+    const enlace = el.closest("a[href]") || el.querySelector("a[href]");
+    const destino = enlace || el;
+    const describir = (e) => `"${(e.innerText || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40)}" (${e.tagName.toLowerCase()})`;
+
+    // Para saber si el clic ha hecho algo: cambio de dirección, la fila ya no está o se ha abierto una ventana encima.
+    const ventanas = () =>
+      [...document.querySelectorAll("[role=dialog],.modal,.cdk-overlay-pane,[class*=drawer],[class*=sidenav],[class*=detail]")].filter(visible).length;
+    const antes = { url: location.href, ventanas: ventanas() };
+    const haCambiado = () => location.href !== antes.url || !fila.isConnected || !visible(fila) || ventanas() > antes.ventanas;
+    const esperarCambio = async (ms) => {
+      const limite = Date.now() + ms;
+      while (Date.now() < limite) {
+        if (haCambiado()) return true;
+        await dormir(250);
+      }
+      return haCambiado();
+    };
+
+    traza.push(`pulso ${describir(destino)}`);
     pulsar(destino);
-    return { ok: true, traza };
+    if (enlace || (await esperarCambio(2500))) return { ok: true, traza };
+
+    // La fila no se abre con un clic: se prueba con doble clic.
+    traza.push("no ha cambiado nada: pruebo con doble clic en la fila");
+    for (const objetivo of [el, fila]) {
+      objetivo.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, cancelable: true, view: window, detail: 2 }));
+      if (await esperarCambio(2500)) return { ok: true, traza };
+    }
+    traza.push("la fila tampoco se abre con doble clic");
+    return { ok: false, error: `se encuentra "${textos[0]}" en los resultados, pero al pulsarlo no se abre la amenaza`, traza };
   }
 
   if (accion === "campo") {

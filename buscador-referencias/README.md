@@ -32,7 +32,7 @@ de acceso al portal (`cybersecurity.telefonica.com`).
 | 1 | clic | `Filtros` | | Abre el panel de filtros |
 | 2 | campo | `{ref}` | `Referencia` | Escribe la referencia en el campo *Referencia* (no en *Referencia externa* ni en otros) |
 | 3 | clic | `Buscar` | | Pulsa el *Buscar* del panel de filtros (si hay varios, el que está junto al campo) |
-| 4 | abrirResultado | `{ref}` | | Espera a los resultados y pulsa el que tiene **exactamente** esa referencia (`CAF-D-1731` no abre `CAF-D-17317`) para abrir la ficha de la amenaza |
+| 4 | abrirResultado | `{ref}` | | Espera a los resultados y pulsa la celda de la columna *Referencia* que tiene **exactamente** esa referencia (`CAF-D-1731` no abre `CAF-D-17317`) para abrir la amenaza. Nunca pulsa otros enlaces de la fila, como el caso `CARR-D-213063-0001` de la columna *Casos*. Si con un clic no se abre, prueba con doble clic |
 
 Si el panel de filtros ya estaba abierto y el paso 1 lo cierra, el paso 2 lo detecta y vuelve a pulsar *Filtros*.
 Cada pestaña acaba en la ficha de su amenaza. Si el portal abre la ficha en una pestaña nueva, la extensión se queda
