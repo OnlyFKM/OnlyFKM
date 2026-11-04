@@ -52,12 +52,17 @@ Si el panel de filtros ya estaba abierto y el paso 1 lo cierra, el paso 2 lo det
 Cada pestaña acaba en la ficha de su amenaza. Si el portal abre la ficha en una pestaña nueva, la extensión se queda
 con esa y cierra la del listado. El clic del paso 4 se hace de una referencia en una para que cada ficha nueva
 se asigne a la referencia correcta.
-Como cada pestaña entra en su cliente por su enlace, las referencias se abren en paralelo y tarda unos segundos.
+**Las referencias se procesan una a una, con su pestaña delante** mientras la extensión trabaja en ella (unos 8-10 s
+por referencia). El navegador "duerme" las pestañas en segundo plano (no las dibuja y frena sus temporizadores) y el
+portal, que es pesado y va en un marco, a veces no terminaba de responder en ellas: por eso unas veces se abría la
+referencia y otras no. Si una referencia falla igualmente, se cierra su pestaña y **se reintenta una vez** desde el
+principio. Se puede volver a procesar todas a la vez desmarcando en Opciones *Procesar las referencias una a una*
+(más rápido, menos fiable).
 
 El portal muestra el listado de amenazas dentro de un **marco** (iframe) de la página: antes de cada paso la extensión
 busca en todos los marcos dónde está lo que necesita (el botón *Filtros*, el campo *Referencia*, el resultado…) y hace
 el paso ahí. Por eso al guardar pide permiso para `*.telefonica.com` además de `cybersecurity.telefonica.com`:
-el marco podría servirse desde otro subdominio. Si un paso no encuentra nada, **Ver qué hizo** lista los marcos que ve.
+el marco podría servirse desde otro subdominio.
 
 **Antes de usarla, activa el modo Digital Risk Protection en el portal**: la extensión no lo cambia.
 
@@ -93,7 +98,7 @@ Para sacar un selector: clic derecho sobre el elemento → *Inspeccionar*. Si ti
 
 **Tipos de referencia:** la letra que va tras el código del cliente (`CAF-`**`D`**`-17317`) dice qué modo activar.
 Viene configurado `D` → *Digital Risk Protection*; puedes añadir más letras en Opciones. Si una referencia lleva una letra sin modo,
-no se abre y aparece en el error del popup. Las referencias sin letra (p. ej. `BANK; 12345`) usan el *tipo por defecto* (`D`).
+no se abre. Las referencias sin letra (p. ej. `BANK; 12345`) usan el *tipo por defecto* (`D`).
 
 Si el portal tarda en cargar entre pasos, sube la *Espera entre pasos*.
 
@@ -137,12 +142,9 @@ Pérez Llorca: 777
 ```
 
 Antes de abrir verás la lista de referencias detectadas. Puedes cambiar el cliente de cualquiera o quitarla.
-Las que no tengan cliente salen en rojo. Al pulsar **Abrir** se abren todas las demás y, al terminar,
-el popup muestra un error con las referencias a las que no se les encontró cliente. Además, esas referencias se quedan en el
-cuadro de texto para que las corrijas (por ejemplo `CLIENTE; REFERENCIA`) y las vuelvas a lanzar.
-
-Si alguna búsqueda falla en el portal, el icono muestra un `!` y el popup indica qué referencia falló y por qué.
-Debajo de cada error, **Ver qué hizo** muestra paso a paso lo que llegó a hacer la extensión antes de fallar.
+Las que no tengan cliente salen en rojo. Al pulsar **Abrir** se abren todas las demás; las que no tienen cliente se quedan
+en el cuadro de texto para la próxima vez que abras el popup, por si quieres corregirlas (por ejemplo `CLIENTE; REFERENCIA`)
+y lanzarlas de nuevo. El popup no muestra ningún aviso de errores al terminar.
 
 ## Pasar la configuración de Chrome a Edge
 

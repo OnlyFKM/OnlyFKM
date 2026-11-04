@@ -10,7 +10,7 @@ async function iniciar() {
   $("texto").value = borrador;
   await comprobarPortal();
   analizar();
-  mostrarRegistro();
+  chrome.action.setBadgeText({ text: "" });
 
   $("texto").addEventListener("input", () => {
     chrome.storage.local.set({ borrador: $("texto").value });
@@ -134,54 +134,12 @@ async function abrir() {
   const validas = items.filter((i) => i.cliente);
   if (!validas.length) return;
 
-
-  // Las referencias sin cliente no frenan al resto: se abren las demás y las fallidas
-  // quedan en el registro (con el aviso "!") y en el cuadro de texto para corregirlas.
+  // Las referencias sin cliente no frenan al resto: se abren las demás y las que no tienen cliente
+  // se quedan en el cuadro de texto (para la próxima vez que se abra el popup).
   const sinCliente = items.filter((i) => !i.cliente).map((i) => i.ref);
+  await chrome.storage.local.set({ borrador: sinCliente.join("\n") });
   await chrome.runtime.sendMessage({ tipo: "abrir", items: validas, sinCliente, urlInicio: portal.url });
-  if (!sinCliente.length) return window.close();
-
-  $("texto").value = sinCliente.join("\n");
-  chrome.storage.local.set({ borrador: $("texto").value });
-  analizar();
+  window.close();
 }
-
-async function mostrarRegistro() {
-  const { registro } = await chrome.storage.local.get("registro");
-  if (!registro || !registro.entradas.length) return;
-  if (registro.enCurso) {
-    $("registro").innerHTML = '<span class="suave">Abriendo búsquedas…</span>';
-    return;
-  }
-  const errores = registro.entradas.filter((e) => !e.ok);
-  const div = $("registro");
-  if (!errores.length) {
-    div.innerHTML = `<span class="ok">Última ejecución: ${registro.entradas.length} búsqueda(s) correctas.</span>`;
-    return;
-  }
-  div.innerHTML = `<div class="aviso">Última ejecución: ${errores.length} error(es):</div>`;
-  for (const e of errores) {
-    const linea = document.createElement("div");
-    linea.className = "aviso";
-    linea.textContent = e.cliente ? `• ${e.cliente} / ${e.ref}: ${e.error}` : `• ${e.ref}: ${e.error}`;
-    div.append(linea);
-    if (e.traza && e.traza.length) {
-      // Lo que llegó a hacer antes de fallar, para saber dónde se quedó.
-      const det = document.createElement("details");
-      const sum = document.createElement("summary");
-      sum.textContent = "Ver qué hizo";
-      const pre = document.createElement("pre");
-      pre.textContent = e.traza.join("\n");
-      det.append(sum, pre);
-      div.append(det);
-    }
-  }
-  chrome.action.setBadgeText({ text: "" });
-}
-
-// El registro se actualiza mientras se abren las pestañas: se repinta si el popup sigue abierto.
-chrome.storage.onChanged.addListener((cambios, area) => {
-  if (area === "local" && cambios.registro) mostrarRegistro();
-});
 
 iniciar();

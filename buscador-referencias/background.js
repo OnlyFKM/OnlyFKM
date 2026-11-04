@@ -37,14 +37,14 @@ async function abrirTodas(items, sinCliente, urlInicio) {
     const { ref, cliente } = items[i];
     chrome.action.setBadgeText({ text: String(items.length - i) });
 
-    const tarea = abrirUna(config, cliente, ref)
+    const tarea = abrirConReintento(config, cliente, ref)
       .then(() => registro.push({ ref, cliente: cliente.nombre, ok: true }))
       .catch((e) => registro.push({ ref, cliente: cliente.nombre, ok: false, error: e.message, traza: e.traza }))
       .then(() => guardarRegistro());
 
-    // En modo formulario y en secuencia, se espera a que termine cada búsqueda antes de la siguiente
-    // (algunos portales guardan el cliente seleccionado en la sesión).
-    if (config.modo === "formulario" && config.enSecuencia) await tarea;
+    // En secuencia (por defecto) se espera a que termine cada referencia antes de empezar la siguiente:
+    // su pestaña está delante mientras se trabaja en ella (ver abrirUna) y el portal no se satura.
+    if (config.modo !== "url" && config.enSecuencia) await tarea;
     else pendientes.push(tarea);
 
     if (i < items.length - 1) await esperar(config.retardoEntrePestanasMs);
@@ -59,13 +59,25 @@ async function abrirTodas(items, sinCliente, urlInicio) {
   }
   await guardarRegistro(false);
 
-  const errores = registro.filter((r) => !r.ok).length;
-  chrome.action.setBadgeBackgroundColor({ color: errores ? "#d93025" : "#188038" });
-  chrome.action.setBadgeText({ text: errores ? "!" : "" });
+  chrome.action.setBadgeText({ text: "" });
+}
+
+// Si una referencia falla en el portal (p. ej. porque tardó en cargar), se cierra su pestaña y se intenta
+// una vez más desde el principio. Los fallos previos a abrir la pestaña (sin enlace, tipo sin modo) no se repiten.
+async function abrirConReintento(config, cliente, ref) {
+  try {
+    await abrirUna(config, cliente, ref);
+  } catch (e) {
+    if (e.tabId == null) throw e;
+    await chrome.tabs.remove(e.tabId).catch(() => {});
+    await abrirUna(config, cliente, ref);
+  }
 }
 
 async function abrirUna(config, cliente, ref) {
-  const active = !!config.activarPestanas;
+  // En secuencia, la pestaña se pone delante mientras se trabaja en ella: el navegador "duerme" las pestañas
+  // en segundo plano (no las dibuja y frena sus temporizadores) y el portal no termina de responder en ellas.
+  const active = !!config.activarPestanas || (config.modo !== "url" && !!config.enSecuencia);
 
   if (config.modo === "url") {
     await chrome.tabs.create({ url: construirUrl(config.urlPlantilla, cliente, ref), active });
@@ -109,83 +121,88 @@ async function abrirUna(config, cliente, ref) {
 const ACCIONES_QUE_NAVEGAN = ["clic", "enviar", "seleccionar", "panelCliente", "abrirResultado"];
 
 async function hacerPasos(config, cliente, valores, tabId, nuevas) {
-  const traza = []; // lo que se ha hecho, para mostrarlo en el popup si algo falla
+  const traza = []; // lo que se ha hecho en cada paso (queda en el registro interno de la ejecución)
   const marcos = { ultimo: null }; // marco (iframe) donde se hizo el último paso
-  for (const [n, paso] of pasosDe(config).entries()) {
-    if (paso.accion === "esperar") {
-      await esperar(Number(paso.texto) || 1000);
-      continue;
-    }
-    const plantilla = String(paso.texto || "").trim();
-    // Para el cliente se prueba con el nombre y con el valor del desplegable.
-    const textos =
-      plantilla === "{cliente}"
-        ? [cliente.nombre, cliente.valor].filter(Boolean)
-        : [plantilla.replace(/\{(cliente|ref|modo|tipo)\}/g, (_, k) => valores[k] || "")];
+  try {
+    for (const [n, paso] of pasosDe(config).entries()) {
+      if (paso.accion === "esperar") {
+        await esperar(Number(paso.texto) || 1000);
+        continue;
+      }
+      const plantilla = String(paso.texto || "").trim();
+      // Para el cliente se prueba con el nombre y con el valor del desplegable.
+      const textos =
+        plantilla === "{cliente}"
+          ? [cliente.nombre, cliente.valor].filter(Boolean)
+          : [plantilla.replace(/\{(cliente|ref|modo|tipo)\}/g, (_, k) => valores[k] || "")];
 
-    const args = [paso.accion, paso.selector || "", textos, config.timeoutMs, { ob: config.obPanel }];
-    const navega = ACCIONES_QUE_NAVEGAN.includes(paso.accion);
-    const abrePestanas = ACCIONES_QUE_ABREN_PESTANAS.includes(paso.accion);
+      const args = [paso.accion, paso.selector || "", textos, config.timeoutMs, { ob: config.obPanel }];
+      const navega = ACCIONES_QUE_NAVEGAN.includes(paso.accion);
+      const abrePestanas = ACCIONES_QUE_ABREN_PESTANAS.includes(paso.accion);
 
-    const hacerPaso = async () => {
-      if (abrePestanas) nuevas.length = 0; // solo cuentan las pestañas creadas durante este paso
-      // Para abrir el resultado se prueba primero un clic de ratón real (algunas tablas no hacen caso
-      // de los clics simulados); si no abre nada, se sigue con el clic simulado de siempre.
-      let previo = [];
-      if (paso.accion === "abrirResultado" && config.clicReal !== false) {
-        const real = await abrirConClicReal(tabId, textos, config, marcos, nuevas);
-        if (real.abierto) {
-          traza.push(`paso ${n + 1} ${paso.accion} ✓`);
-          for (const t of real.traza) traza.push(`   · ${t}`);
-          await esperar(config.esperaEntrePasosMs);
-          await cambiarAPestanaNueva();
-          return;
+      const hacerPaso = async () => {
+        if (abrePestanas) nuevas.length = 0; // solo cuentan las pestañas creadas durante este paso
+        // Para abrir el resultado se prueba primero un clic de ratón real (algunas tablas no hacen caso
+        // de los clics simulados); si no abre nada, se sigue con el clic simulado de siempre.
+        let previo = [];
+        if (paso.accion === "abrirResultado" && config.clicReal !== false) {
+          const real = await abrirConClicReal(tabId, textos, config, marcos, nuevas);
+          if (real.abierto) {
+            traza.push(`paso ${n + 1} ${paso.accion} ✓`);
+            for (const t of real.traza) traza.push(`   · ${t}`);
+            await esperar(config.esperaEntrePasosMs);
+            await cambiarAPestanaNueva();
+            return;
+          }
+          previo = real.traza;
         }
-        previo = real.traza;
-      }
-      let r = await ejecutarEnSuMarco(tabId, args, marcos);
-      r.traza = [...previo, ...(r.traza || [])];
-      if (!r.ok && r.navegando && !navega) {
-        // La página se estaba recargando: se espera a que termine y se repite el paso.
-        await esperarCarga(tabId, config.timeoutMs);
-        r = await ejecutarEnSuMarco(tabId, args, marcos);
-      }
-      if (!r.ok && !(r.navegando && navega)) {
-        const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
-        error.traza = [...traza, ...(r.traza || [])];
-        throw error;
-      }
-      traza.push(`paso ${n + 1} ${paso.accion} ✓`);
-      for (const t of r.traza || []) traza.push(`   · ${t}`);
+        let r = await ejecutarEnSuMarco(tabId, args, marcos);
+        r.traza = [...previo, ...(r.traza || [])];
+        if (!r.ok && r.navegando && !navega) {
+          // La página se estaba recargando: se espera a que termine y se repite el paso.
+          await esperarCarga(tabId, config.timeoutMs);
+          r = await ejecutarEnSuMarco(tabId, args, marcos);
+        }
+        if (!r.ok && !(r.navegando && navega)) {
+          const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0] || paso.selector}): ${r.error}`);
+          error.traza = [...traza, ...(r.traza || [])];
+          throw error;
+        }
+        traza.push(`paso ${n + 1} ${paso.accion} ✓`);
+        for (const t of r.traza || []) traza.push(`   · ${t}`);
 
-      // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
-      await esperar(config.esperaEntrePasosMs);
-      await cambiarAPestanaNueva();
-    };
-    const cambiarAPestanaNueva = async () => {
-      const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, abrePestanas);
-      if (abierta) {
-        const anterior = tabId;
-        tabId = abierta.id;
-        propias.add(tabId);
-        propias.delete(anterior);
-        chrome.tabs.remove(anterior).catch(() => {});
-        traza.push(`   · sigo en la pestaña nueva que ha abierto el portal`);
-      }
-    };
+        // El paso puede recargar la página o cargar contenido: se espera antes del siguiente.
+        await esperar(config.esperaEntrePasosMs);
+        await cambiarAPestanaNueva();
+      };
+      const cambiarAPestanaNueva = async () => {
+        const abierta = await pestanaAbiertaPorElPaso(nuevas.splice(0), tabId, abrePestanas);
+        if (abierta) {
+          const anterior = tabId;
+          tabId = abierta.id;
+          propias.add(tabId);
+          propias.delete(anterior);
+          chrome.tabs.remove(anterior).catch(() => {});
+          traza.push(`   · sigo en la pestaña nueva que ha abierto el portal`);
+        }
+      };
 
-    if (paso.accion === "abrirResultado") {
-      // Se espera a que salgan los resultados fuera del candado; dentro solo se pulsa.
-      const espera = await ejecutarEnSuMarco(tabId, [paso.accion, "", textos, config.timeoutMs, { soloEsperar: true }], marcos);
-      if (!espera.ok && !espera.navegando) {
-        const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0]}): ${espera.error}`);
-        error.traza = [...traza, ...(espera.traza || [])];
-        throw error;
+      if (paso.accion === "abrirResultado") {
+        // Se espera a que salgan los resultados fuera del candado; dentro solo se pulsa.
+        const espera = await ejecutarEnSuMarco(tabId, [paso.accion, "", textos, config.timeoutMs, { soloEsperar: true }], marcos);
+        if (!espera.ok && !espera.navegando) {
+          const error = new Error(`paso ${n + 1} (${paso.accion} ${textos[0]}): ${espera.error}`);
+          error.traza = [...traza, ...(espera.traza || [])];
+          throw error;
+        }
       }
+      if (abrePestanas) await conCandado(hacerPaso);
+      else await hacerPaso();
+      await esperarCarga(tabId, config.timeoutMs);
     }
-    if (abrePestanas) await conCandado(hacerPaso);
-    else await hacerPaso();
-    await esperarCarga(tabId, config.timeoutMs);
+  } catch (e) {
+    e.tabId = tabId; // pestaña donde falló (puede ser una nueva que abrió el portal), para el reintento
+    throw e;
   }
   return tabId;
 }
